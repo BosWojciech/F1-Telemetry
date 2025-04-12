@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4AB52E6B2D97326700AA7D3C /* CopyFiles */ = {
+		4A694C402DAA54BA00370035 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -19,19 +19,19 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4AB52E6D2D97326700AA7D3C /* F1-Telemetry */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "F1-Telemetry"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A694C422DAA54BA00370035 /* F1-telemetry */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "F1-telemetry"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4AB52E6F2D97326700AA7D3C /* F1-Telemetry */ = {
+		4A694C442DAA54BA00370035 /* F1-telemetry */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "F1-Telemetry";
+			path = "F1-telemetry";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		4AB52E6A2D97326700AA7D3C /* Frameworks */ = {
+		4A694C3F2DAA54BA00370035 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -41,18 +41,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4AB52E642D97326700AA7D3C = {
+		4A694C392DAA54BA00370035 = {
 			isa = PBXGroup;
 			children = (
-				4AB52E6F2D97326700AA7D3C /* F1-Telemetry */,
-				4AB52E6E2D97326700AA7D3C /* Products */,
+				4A694C442DAA54BA00370035 /* F1-telemetry */,
+				4A694C432DAA54BA00370035 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		4AB52E6E2D97326700AA7D3C /* Products */ = {
+		4A694C432DAA54BA00370035 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4AB52E6D2D97326700AA7D3C /* F1-Telemetry */,
+				4A694C422DAA54BA00370035 /* F1-telemetry */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -60,63 +60,63 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4AB52E6C2D97326700AA7D3C /* F1-Telemetry */ = {
+		4A694C412DAA54BA00370035 /* F1-telemetry */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4AB52E742D97326700AA7D3C /* Build configuration list for PBXNativeTarget "F1-Telemetry" */;
+			buildConfigurationList = 4A694C492DAA54BA00370035 /* Build configuration list for PBXNativeTarget "F1-telemetry" */;
 			buildPhases = (
-				4AB52E692D97326700AA7D3C /* Sources */,
-				4AB52E6A2D97326700AA7D3C /* Frameworks */,
-				4AB52E6B2D97326700AA7D3C /* CopyFiles */,
+				4A694C3E2DAA54BA00370035 /* Sources */,
+				4A694C3F2DAA54BA00370035 /* Frameworks */,
+				4A694C402DAA54BA00370035 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				4AB52E6F2D97326700AA7D3C /* F1-Telemetry */,
+				4A694C442DAA54BA00370035 /* F1-telemetry */,
 			);
-			name = "F1-Telemetry";
+			name = "F1-telemetry";
 			packageProductDependencies = (
 			);
-			productName = "F1-Telemetry";
-			productReference = 4AB52E6D2D97326700AA7D3C /* F1-Telemetry */;
+			productName = "F1-telemetry";
+			productReference = 4A694C422DAA54BA00370035 /* F1-telemetry */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		4AB52E652D97326700AA7D3C /* Project object */ = {
+		4A694C3A2DAA54BA00370035 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					4AB52E6C2D97326700AA7D3C = {
+					4A694C412DAA54BA00370035 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
 			};
-			buildConfigurationList = 4AB52E682D97326700AA7D3C /* Build configuration list for PBXProject "F1-Telemetry" */;
+			buildConfigurationList = 4A694C3D2DAA54BA00370035 /* Build configuration list for PBXProject "F1-telemetry" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 4AB52E642D97326700AA7D3C;
+			mainGroup = 4A694C392DAA54BA00370035;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 4AB52E6E2D97326700AA7D3C /* Products */;
+			productRefGroup = 4A694C432DAA54BA00370035 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4AB52E6C2D97326700AA7D3C /* F1-Telemetry */,
+				4A694C412DAA54BA00370035 /* F1-telemetry */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		4AB52E692D97326700AA7D3C /* Sources */ = {
+		4A694C3E2DAA54BA00370035 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -126,7 +126,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		4AB52E722D97326700AA7D3C /* Debug */ = {
+		4A694C472DAA54BA00370035 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -187,7 +187,7 @@
 			};
 			name = Debug;
 		};
-		4AB52E732D97326700AA7D3C /* Release */ = {
+		4A694C482DAA54BA00370035 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -241,7 +241,7 @@
 			};
 			name = Release;
 		};
-		4AB52E752D97326700AA7D3C /* Debug */ = {
+		4A694C4A2DAA54BA00370035 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -249,7 +249,7 @@
 			};
 			name = Debug;
 		};
-		4AB52E762D97326700AA7D3C /* Release */ = {
+		4A694C4B2DAA54BA00370035 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -260,25 +260,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4AB52E682D97326700AA7D3C /* Build configuration list for PBXProject "F1-Telemetry" */ = {
+		4A694C3D2DAA54BA00370035 /* Build configuration list for PBXProject "F1-telemetry" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4AB52E722D97326700AA7D3C /* Debug */,
-				4AB52E732D97326700AA7D3C /* Release */,
+				4A694C472DAA54BA00370035 /* Debug */,
+				4A694C482DAA54BA00370035 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4AB52E742D97326700AA7D3C /* Build configuration list for PBXNativeTarget "F1-Telemetry" */ = {
+		4A694C492DAA54BA00370035 /* Build configuration list for PBXNativeTarget "F1-telemetry" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4AB52E752D97326700AA7D3C /* Debug */,
-				4AB52E762D97326700AA7D3C /* Release */,
+				4A694C4A2DAA54BA00370035 /* Debug */,
+				4A694C4B2DAA54BA00370035 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 4AB52E652D97326700AA7D3C /* Project object */;
+	rootObject = 4A694C3A2DAA54BA00370035 /* Project object */;
 }
