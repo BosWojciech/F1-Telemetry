@@ -28,6 +28,7 @@ int main() {
 
     while (true) {
 
+        // clearing console
         std::cout << "\033[2J\033[H";
 
         ssize_t bytesReceived = client.receiveData(buffer, sizeof(buffer));
