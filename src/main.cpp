@@ -37,7 +37,7 @@ int main() {
             break;
         }
 
-        if (bytesReceived < sizeof(PacketHeader)) {
+        if (static_cast<size_t>(bytesReceived) < sizeof(PacketHeader)) {
             std::cerr << "Received packet too small for header!" << std::endl;
             continue;
         }
@@ -48,7 +48,7 @@ int main() {
 
         switch (header.packetId) {
             case 6: { // PacketCarTelemetryData
-                if (bytesReceived < PACKET_CAR_TELEMETRY_DATA_SIZE) {
+                if (static_cast<size_t>(bytesReceived) < PACKET_CAR_TELEMETRY_DATA_SIZE) {
                     //std::cerr << "Received PacketCarTelemetryData too small! Expected " << PACKET_CAR_TELEMETRY_DATA_SIZE << ", got " << bytesReceived << " bytes." << std::endl;
                     continue;
                 }
