@@ -2,6 +2,7 @@
 #define UDPCLIENT_H
 
 #include <cstddef> // For size_t
+#include <sys/types.h> // For ssize_t
 
 class UdpClient {
 public:
