@@ -27,6 +27,9 @@ int main() {
     char buffer[2048];
 
     while (true) {
+
+        std::cout << "\033[2J\033[H";
+
         ssize_t bytesReceived = client.receiveData(buffer, sizeof(buffer));
         if (bytesReceived == -1) {
             std::cerr << "Error receiving data." << std::endl;
@@ -59,13 +62,14 @@ int main() {
                 }
 
                 const CarTelemetryData& playerCar = telemetryPacket.carTelemetryData[playerIndex];
-                std::cout << "\033[2J\033[H";
                 std::cout << "Player Car Telemetry:" << std::endl;
+                std::cout << "  Steer: " << playerCar.steer << std::endl;
                 std::cout << "  Throttle: " << playerCar.throttle << std::endl;
                 std::cout << "  Brake: " << playerCar.brake << std::endl;
                 std::cout << "  RPM: " << playerCar.engineRPM << std::endl;
                 std::cout << "  Gear: " << static_cast<int>(playerCar.gear) << std::endl;
                 std::cout << "  Speed: " << playerCar.speed << "km/h" <<std::endl;
+                std::cout << "  DRS: " << static_cast<int>(playerCar.drs) << std::endl;
                 break;
             }
 
