@@ -1,5 +1,5 @@
-#include "udpClient.h"
-#include "DataTypes.h"
+#include "network/udpClient.h"
+#include "core/DataTypes.h"
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>

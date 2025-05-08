@@ -1,0 +1,19 @@
+{
+    "cars": [
+        {
+            "m_worldPositionX": 213,
+            "m_worldPositionY": 243,
+            "m_worldPositionz": 342
+        },
+        {
+            "m_worldPositionX": 212,
+            "m_worldPositionY": 246,
+            "m_worldPositionz": 341
+        },
+        {
+            "m_worldPositionX": 217,
+            "m_worldPositionY": 245,
+            "m_worldPositionz": 348
+        }
+    ]
+}
