@@ -5,7 +5,6 @@
 #include <string>
 
 const size_t PACKET_MOTION_DATA_SIZE = 1349;
-const size_t PACKET_CAR_TELEMETRY_DATA_SIZE = 1352;
 const size_t PACKET_SESSION_DATA_SIZE = 644;
 const size_t PACKET_LAP_DATA_SIZE = 1131;
 const size_t PACKET_EVENT_DATA_SIZE = 45;
@@ -42,148 +41,117 @@ struct PacketHeader
 // Car Motion Data struct
 struct CarMotionData
 {
-    float m_worldPositionX;     // World space X position - meters
-    float m_worldPositionY;     // World space Y position
-    float m_worldPositionZ;     // World space Z position
-    float m_worldVelocityX;     // Velocity in world space X - meters/s
-    float m_worldVelocityY;     // Velocity in world space Y
-    float m_worldVelocityZ;     // Velocity in world space Z
-    int16_t m_worldForwardDirX; // World space forward X direction (normalized)
-    int16_t m_worldForwardDirY; // World space forward Y direction (normalized)
-    int16_t m_worldForwardDirZ; // World space forward Z direction (normalized)
-    int16_t m_worldRightDirX;   // World space right X direction (normalized)
-    int16_t m_worldRightDirY;   // World space right Y direction (normalized)
-    int16_t m_worldRightDirZ;   // World space right Z direction (normalized)
-    float m_gForceLateral;      // Lateral G-Force component
-    float m_gForceLongitudinal; // Longitudinal G-Force component
-    float m_gForceVertical;     // Vertical G-Force component
-    float m_yaw;                // Yaw angle in radians
-    float m_pitch;              // Pitch angle in radians
-    float m_roll;               // Roll angle in radians
+    float worldPositionX;     // World space X position - meters
+    float worldPositionY;     // World space Y position
+    float worldPositionZ;     // World space Z position
+    float worldVelocityX;     // Velocity in world space X - meters/s
+    float worldVelocityY;     // Velocity in world space Y
+    float worldVelocityZ;     // Velocity in world space Z
+    int16_t worldForwardDirX; // World space forward X direction (normalized)
+    int16_t worldForwardDirY; // World space forward Y direction (normalized)
+    int16_t worldForwardDirZ; // World space forward Z direction (normalized)
+    int16_t worldRightDirX;   // World space right X direction (normalized)
+    int16_t worldRightDirY;   // World space right Y direction (normalized)
+    int16_t worldRightDirZ;   // World space right Z direction (normalized)
+    float gForceLateral;      // Lateral G-Force component
+    float gForceLongitudinal; // Longitudinal G-Force component
+    float gForceVertical;     // Vertical G-Force component
+    float yaw;                // Yaw angle in radians
+    float pitch;              // Pitch angle in radians
+    float roll;               // Roll angle in radians
 };
 
 // Packet Motion Data struct
 struct PacketMotionData
 {
-    PacketHeader m_header;             // Header
-    CarMotionData m_carMotionData[22]; // Data for all cars on track
-};
-
-// Car Telemetry Data struct
-struct CarTelemetryData
-{
-    uint16_t speed;                     // Speed of car in kilometres per hour
-    float throttle;                     // Throttle applied (0.0 to 1.0)
-    float steer;                        // Steering (-1.0 to 1.0)
-    float brake;                        // Brake applied (0.0 to 1.0)
-    uint8_t clutch;                     // Clutch applied (0 to 100)
-    int8_t gear;                        // Gear (1-8, N=0, R=-1)
-    uint16_t engineRPM;                 // Engine RPM
-    uint8_t drs;                        // 0 = off, 1 = on
-    uint8_t revLightsPercent;           // Rev lights percentage
-    uint16_t revLightsBitValue;         // Rev lights bitfield
-    uint16_t brakesTemperature[4];      // Brakes temperature (celsius)
-    uint8_t tyresSurfaceTemperature[4]; // Tyres surface temperature (celsius)
-    uint8_t tyresInnerTemperature[4];   // Tyres inner temperature (celsius)
-    uint16_t engineTemperature;         // Engine temperature (celsius)
-    float tyresPressure[4];             // Tyres pressure (PSI)
-    uint8_t surfaceType[4];             // Driving surface type
-};
-
-// Packet Car Telemetry Data struct
-struct PacketCarTelemetryData
-{
-    PacketHeader header;                   // Header
-    CarTelemetryData carTelemetryData[22]; // Telemetry data for all cars (22 total)
-    uint8_t mfdPanelIndex;                 // MFD panel index (0–4 or 255 = closed)
-    uint8_t mfdPanelIndexSecondaryPlayer;  // Secondary player MFD panel index
-    int8_t suggestedGear;                  // Suggested gear (1–8, 0 = none)
+    PacketHeader header;             // Header
+    CarMotionData carMotionData[22]; // Data for all cars on track
 };
 
 // Marshal Zone struct
 struct MarshalZone
 {
-    float m_zoneStart; // Fraction (0..1) of way through the lap the marshal zone starts
-    int8_t m_zoneFlag; // -1 = invalid/unknown, 0 = none, 1 = green, 2 = blue, 3 = yellow
+    float zoneStart; // Fraction (0..1) of way through the lap the marshal zone starts
+    int8_t zoneFlag; // -1 = invalid/unknown, 0 = none, 1 = green, 2 = blue, 3 = yellow
 };
 
 // Weather Forecast Sample struct
 struct WeatherForecastSample
 {
-    uint8_t m_sessionType;           // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P,
+    uint8_t sessionType;           // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P,
                                      // 5 = Q1, 6 = Q2, 7 = Q3, 8 = Short Q, 9 = OSQ,
                                      // 10 = R, 11 = R2, 12 = R3, 13 = Time Trial
-    uint8_t m_timeOffset;            // Time in minutes the forecast is for
-    uint8_t m_weather;               // Weather - 0 = clear, 1 = light cloud, 2 = overcast,
+    uint8_t timeOffset;            // Time in minutes the forecast is for
+    uint8_t weather;               // Weather - 0 = clear, 1 = light cloud, 2 = overcast,
                                      // 3 = light rain, 4 = heavy rain, 5 = storm
-    int8_t m_trackTemperature;       // Track temp. in degrees Celsius
-    int8_t m_trackTemperatureChange; // Track temp. change – 0 = up, 1 = down, 2 = no change
-    int8_t m_airTemperature;         // Air temp. in degrees Celsius
-    int8_t m_airTemperatureChange;   // Air temp. change – 0 = up, 1 = down, 2 = no change
-    uint8_t m_rainPercentage;        // Rain percentage (0–100)
+    int8_t trackTemperature;       // Track temp. in degrees Celsius
+    int8_t trackTemperatureChange; // Track temp. change – 0 = up, 1 = down, 2 = no change
+    int8_t airTemperature;         // Air temp. in degrees Celsius
+    int8_t airTemperatureChange;   // Air temp. change – 0 = up, 1 = down, 2 = no change
+    uint8_t rainPercentage;        // Rain percentage (0–100)
 };
 
 // Packet Session Data struct
 struct PacketSessionData
 {
-    PacketHeader m_header; // Header
+    PacketHeader header; // Header
 
-    uint8_t m_weather;                                  // Weather - 0 = clear, 1 = light cloud, 2 = overcast,
+    uint8_t weather;                                  // Weather - 0 = clear, 1 = light cloud, 2 = overcast,
                                                         // 3 = light rain, 4 = heavy rain, 5 = storm
-    int8_t m_trackTemperature;                          // Track temp. in degrees Celsius
-    int8_t m_airTemperature;                            // Air temp. in degrees Celsius
-    uint8_t m_totalLaps;                                // Total number of laps in this race
-    uint16_t m_trackLength;                             // Track length in metres
-    uint8_t m_sessionType;                              // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P,
+    int8_t trackTemperature;                          // Track temp. in degrees Celsius
+    int8_t airTemperature;                            // Air temp. in degrees Celsius
+    uint8_t totalLaps;                                // Total number of laps in this race
+    uint16_t trackLength;                             // Track length in metres
+    uint8_t sessionType;                              // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P,
                                                         // 5 = Q1, 6 = Q2, 7 = Q3, 8 = Short Q, 9 = OSQ,
                                                         // 10 = R, 11 = R2, 12 = R3, 13 = Time Trial
-    int8_t m_trackId;                                   // -1 for unknown, see appendix
-    uint8_t m_formula;                                  // Formula, 0 = F1 Modern, 1 = F1 Classic, 2 = F2,
+    int8_t trackId;                                   // -1 for unknown, see appendix
+    uint8_t formula;                                  // Formula, 0 = F1 Modern, 1 = F1 Classic, 2 = F2,
                                                         // 3 = F1 Generic, 4 = Beta, 5 = Supercars,
                                                         // 6 = Esports, 7 = F2 2021
-    uint16_t m_sessionTimeLeft;                         // Time left in session in seconds
-    uint16_t m_sessionDuration;                         // Session duration in seconds
-    uint8_t m_pitSpeedLimit;                            // Pit speed limit in kilometres per hour
-    uint8_t m_gamePaused;                               // Whether the game is paused – network game only
-    uint8_t m_isSpectating;                             // Whether the player is spectating
-    uint8_t m_spectatorCarIndex;                        // Index of the car being spectated
-    uint8_t m_sliProNativeSupport;                      // SLI Pro support, 0 = inactive, 1 = active
-    uint8_t m_numMarshalZones;                          // Number of marshal zones to follow
-    MarshalZone m_marshalZones[21];                     // List of marshal zones – max 21
-    uint8_t m_safetyCarStatus;                          // 0 = no safety car, 1 = full,
+    uint16_t sessionTimeLeft;                         // Time left in session in seconds
+    uint16_t sessionDuration;                         // Session duration in seconds
+    uint8_t pitSpeedLimit;                            // Pit speed limit in kilometres per hour
+    uint8_t gamePaused;                               // Whether the game is paused – network game only
+    uint8_t isSpectating;                             // Whether the player is spectating
+    uint8_t spectatorCarIndex;                        // Index of the car being spectated
+    uint8_t sliProNativeSupport;                      // SLI Pro support, 0 = inactive, 1 = active
+    uint8_t numMarshalZones;                          // Number of marshal zones to follow
+    MarshalZone marshalZones[21];                     // List of marshal zones – max 21
+    uint8_t safetyCarStatus;                          // 0 = no safety car, 1 = full,
                                                         // 2 = virtual, 3 = formation lap
-    uint8_t m_networkGame;                              // 0 = offline, 1 = online
-    uint8_t m_numWeatherForecastSamples;                // Number of weather samples to follow
-    WeatherForecastSample m_weatherForecastSamples[56]; // Array of weather forecast samples
-    uint8_t m_forecastAccuracy;                         // 0 = Perfect, 1 = Approximate
-    uint8_t m_aiDifficulty;                             // AI Difficulty rating – 0-110
-    uint32_t m_seasonLinkIdentifier;                    // Identifier for season - persists across saves
-    uint32_t m_weekendLinkIdentifier;                   // Identifier for weekend - persists across saves
-    uint32_t m_sessionLinkIdentifier;                   // Identifier for session - persists across saves
-    uint8_t m_pitStopWindowIdealLap;                    // Ideal lap to pit on for current strategy (player)
-    uint8_t m_pitStopWindowLatestLap;                   // Latest lap to pit on for current strategy (player)
-    uint8_t m_pitStopRejoinPosition;                    // Predicted position to rejoin at (player)
-    uint8_t m_steeringAssist;                           // 0 = off, 1 = on
-    uint8_t m_brakingAssist;                            // 0 = off, 1 = low, 2 = medium, 3 = high
-    uint8_t m_gearboxAssist;                            // 1 = manual, 2 = manual & suggested gear, 3 = auto
-    uint8_t m_pitAssist;                                // 0 = off, 1 = on
-    uint8_t m_pitReleaseAssist;                         // 0 = off, 1 = on
-    uint8_t m_ERSAssist;                                // 0 = off, 1 = on
-    uint8_t m_DRSAssist;                                // 0 = off, 1 = on
-    uint8_t m_dynamicRacingLine;                        // 0 = off, 1 = corners only, 2 = full
-    uint8_t m_dynamicRacingLineType;                    // 0 = 2D, 1 = 3D
-    uint8_t m_gameMode;                                 // Game mode id - see appendix
-    uint8_t m_ruleSet;                                  // Ruleset - see appendix
-    uint32_t m_timeOfDay;                               // Local time of day - minutes since midnight
-    uint8_t m_sessionLength;                            // 0 = None, 2 = Very Short, 3 = Short, 4 = Medium,
+    uint8_t networkGame;                              // 0 = offline, 1 = online
+    uint8_t numWeatherForecastSamples;                // Number of weather samples to follow
+    WeatherForecastSample weatherForecastSamples[56]; // Array of weather forecast samples
+    uint8_t forecastAccuracy;                         // 0 = Perfect, 1 = Approximate
+    uint8_t aiDifficulty;                             // AI Difficulty rating – 0-110
+    uint32_t seasonLinkIdentifier;                    // Identifier for season - persists across saves
+    uint32_t weekendLinkIdentifier;                   // Identifier for weekend - persists across saves
+    uint32_t sessionLinkIdentifier;                   // Identifier for session - persists across saves
+    uint8_t pitStopWindowIdealLap;                    // Ideal lap to pit on for current strategy (player)
+    uint8_t pitStopWindowLatestLap;                   // Latest lap to pit on for current strategy (player)
+    uint8_t pitStopRejoinPosition;                    // Predicted position to rejoin at (player)
+    uint8_t steeringAssist;                           // 0 = off, 1 = on
+    uint8_t brakingAssist;                            // 0 = off, 1 = low, 2 = medium, 3 = high
+    uint8_t gearboxAssist;                            // 1 = manual, 2 = manual & suggested gear, 3 = auto
+    uint8_t pitAssist;                                // 0 = off, 1 = on
+    uint8_t pitReleaseAssist;                         // 0 = off, 1 = on
+    uint8_t ERSAssist;                                // 0 = off, 1 = on
+    uint8_t DRSAssist;                                // 0 = off, 1 = on
+    uint8_t dynamicRacingLine;                        // 0 = off, 1 = corners only, 2 = full
+    uint8_t dynamicRacingLineType;                    // 0 = 2D, 1 = 3D
+    uint8_t gameMode;                                 // Game mode id - see appendix
+    uint8_t ruleSet;                                  // Ruleset - see appendix
+    uint32_t timeOfDay;                               // Local time of day - minutes since midnight
+    uint8_t sessionLength;                            // 0 = None, 2 = Very Short, 3 = Short, 4 = Medium,
                                                         // 5 = Medium Long, 6 = Long, 7 = Full
-    uint8_t m_speedUnitsLeadPlayer;                     // 0 = MPH, 1 = KPH
-    uint8_t m_temperatureUnitsLeadPlayer;               // 0 = Celsius, 1 = Fahrenheit
-    uint8_t m_speedUnitsSecondaryPlayer;                // 0 = MPH, 1 = KPH
-    uint8_t m_temperatureUnitsSecondaryPlayer;          // 0 = Celsius, 1 = Fahrenheit
-    uint8_t m_numSafetyCarPeriods;                      // Number of safety cars called during session
-    uint8_t m_numVirtualSafetyCarPeriods;               // Number of virtual safety cars called
-    uint8_t m_numRedFlagPeriods;                        // Number of red flags called during session
+    uint8_t speedUnitsLeadPlayer;                     // 0 = MPH, 1 = KPH
+    uint8_t temperatureUnitsLeadPlayer;               // 0 = Celsius, 1 = Fahrenheit
+    uint8_t speedUnitsSecondaryPlayer;                // 0 = MPH, 1 = KPH
+    uint8_t temperatureUnitsSecondaryPlayer;          // 0 = Celsius, 1 = Fahrenheit
+    uint8_t numSafetyCarPeriods;                      // Number of safety cars called during session
+    uint8_t numVirtualSafetyCarPeriods;               // Number of virtual safety cars called
+    uint8_t numRedFlagPeriods;                        // Number of red flags called during session
 };
 
 // Lap Data struct
@@ -381,6 +349,37 @@ struct PacketCarSetupData
     CarSetupData carSetups[22]; // Setup data for all cars
 };
 
+// Car Telemetry Data struct
+struct CarTelemetryData
+{
+    uint16_t speed;                     // Speed of car in kilometres per hour
+    float throttle;                     // Throttle applied (0.0 to 1.0)
+    float steer;                        // Steering (-1.0 to 1.0)
+    float brake;                        // Brake applied (0.0 to 1.0)
+    uint8_t clutch;                     // Clutch applied (0 to 100)
+    int8_t gear;                        // Gear (1-8, N=0, R=-1)
+    uint16_t engineRPM;                 // Engine RPM
+    uint8_t drs;                        // 0 = off, 1 = on
+    uint8_t revLightsPercent;           // Rev lights percentage
+    uint16_t revLightsBitValue;         // Rev lights bitfield
+    uint16_t brakesTemperature[4];      // Brakes temperature (celsius)
+    uint8_t tyresSurfaceTemperature[4]; // Tyres surface temperature (celsius)
+    uint8_t tyresInnerTemperature[4];   // Tyres inner temperature (celsius)
+    uint16_t engineTemperature;         // Engine temperature (celsius)
+    float tyresPressure[4];             // Tyres pressure (PSI)
+    uint8_t surfaceType[4];             // Driving surface type
+};
+
+// Packet Car Telemetry Data struct
+struct PacketCarTelemetryData
+{
+    PacketHeader header;                   // Header
+    CarTelemetryData carTelemetryData[22]; // Telemetry data for all cars (22 total)
+    uint8_t mfdPanelIndex;                 // MFD panel index (0–4 or 255 = closed)
+    uint8_t mfdPanelIndexSecondaryPlayer;  // Secondary player MFD panel index
+    int8_t suggestedGear;                  // Suggested gear (1–8, 0 = none)
+};
+
 struct CarTelemetryData
 {
     uint16_t speed;                     // Speed of car in kilometres per hour
@@ -573,50 +572,50 @@ struct PacketSessionHistoryData
 // Tyre Set Data struct
 struct TyreSetData
 {
-    uint8_t m_actualTyreCompound; // Actual tyre compound used
-    uint8_t m_visualTyreCompound; // Visual tyre compound used
-    uint8_t m_wear;               // Tyre wear (percentage)
-    uint8_t m_available;          // Whether this set is currently available
-    uint8_t m_recommendedSession; // Recommended session for tyre set
-    uint8_t m_lifeSpan;           // Laps left in this tyre set
-    uint8_t m_usableLife;         // Max number of laps recommended for this compound
-    int16_t m_lapDeltaTime;       // Lap delta time in milliseconds compared to fitted set
-    uint8_t m_fitted;             // Whether the set is fitted or not
+    uint8_t actualTyreCompound; // Actual tyre compound used
+    uint8_t visualTyreCompound; // Visual tyre compound used
+    uint8_t wear;               // Tyre wear (percentage)
+    uint8_t available;          // Whether this set is currently available
+    uint8_t recommendedSession; // Recommended session for tyre set
+    uint8_t lifeSpan;           // Laps left in this tyre set
+    uint8_t usableLife;         // Max number of laps recommended for this compound
+    int16_t lapDeltaTime;       // Lap delta time in milliseconds compared to fitted set
+    uint8_t fitted;             // Whether the set is fitted or not
 };
 
 // Packet Tyre Sets Data struct
 struct PacketTyreSetsData
 {
-    PacketHeader m_header;         // Header
-    uint8_t m_carIdx;              // Index of the car this data relates to
-    TyreSetData m_tyreSetData[20]; // 13 (dry) + 7 (wet)
-    uint8_t m_fittedIdx;           // Index into array of fitted tyre
+    PacketHeader header;         // Header
+    uint8_t carIdx;              // Index of the car this data relates to
+    TyreSetData tyreSetData[20]; // 13 (dry) + 7 (wet)
+    uint8_t fittedIdx;           // Index into array of fitted tyre
 };
 
 // Packet Motion Extended Data struct
 struct PacketMotionExData
 {
-    PacketHeader m_header;             // Header
-    float m_suspensionPosition[4];     // Suspension position for each wheel (RL, RR, FL, FR)
-    float m_suspensionVelocity[4];     // Suspension velocity for each wheel
-    float m_suspensionAcceleration[4]; // Suspension acceleration for each wheel
-    float m_wheelSpeed[4];             // Speed of each wheel
-    float m_wheelSlipRatio[4];         // Slip ratio for each wheel
-    float m_wheelSlipAngle[4];         // Slip angles for each wheel
-    float m_wheelLatForce[4];          // Lateral forces for each wheel
-    float m_wheelLongForce[4];         // Longitudinal forces for each wheel
-    float m_heightOfCOGAboveGround;    // Height of centre of gravity above ground
-    float m_localVelocityX;            // Velocity in local space – metres/s
-    float m_localVelocityY;            // Velocity in local space
-    float m_localVelocityZ;            // Velocity in local space
-    float m_angularVelocityX;          // Angular velocity x-component – radians/s
-    float m_angularVelocityY;          // Angular velocity y-component
-    float m_angularVelocityZ;          // Angular velocity z-component
-    float m_angularAccelerationX;      // Angular acceleration x-component – radians/s/s
-    float m_angularAccelerationY;      // Angular acceleration y-component
-    float m_angularAccelerationZ;      // Angular acceleration z-component
-    float m_frontWheelsAngle;          // Current front wheels angle in radians
-    float m_wheelVertForce[4];         // Vertical forces for each wheel
+    PacketHeader header;             // Header
+    float suspensionPosition[4];     // Suspension position for each wheel (RL, RR, FL, FR)
+    float suspensionVelocity[4];     // Suspension velocity for each wheel
+    float suspensionAcceleration[4]; // Suspension acceleration for each wheel
+    float wheelSpeed[4];             // Speed of each wheel
+    float wheelSlipRatio[4];         // Slip ratio for each wheel
+    float wheelSlipAngle[4];         // Slip angles for each wheel
+    float wheelLatForce[4];          // Lateral forces for each wheel
+    float wheelLongForce[4];         // Longitudinal forces for each wheel
+    float heightOfCOGAboveGround;    // Height of centre of gravity above ground
+    float localVelocityX;            // Velocity in local space – metres/s
+    float localVelocityY;            // Velocity in local space
+    float localVelocityZ;            // Velocity in local space
+    float angularVelocityX;          // Angular velocity x-component – radians/s
+    float angularVelocityY;          // Angular velocity y-component
+    float angularVelocityZ;          // Angular velocity z-component
+    float angularAccelerationX;      // Angular acceleration x-component – radians/s/s
+    float angularAccelerationY;      // Angular acceleration y-component
+    float angularAccelerationZ;      // Angular acceleration z-component
+    float frontWheelsAngle;          // Current front wheels angle in radians
+    float wheelVertForce[4];         // Vertical forces for each wheel
 };
 
 #pragma pack(pop)
