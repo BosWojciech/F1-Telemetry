@@ -11,12 +11,12 @@ This information is crucial for context and data integrity.
 - [ ] `game_major_version` - Game major version
 - [ ] `game_minor_version` - Game minor version
 - [ ] `packet_version` - Version of this packet type
-- [ ] `packet_id` - Identifier for the packet type (e.g., 0 = Motion, 1 = Session, etc.)
+- [x] `packet_id` - Identifier for the packet type (e.g., 0 = Motion, 1 = Session, etc.)
 - [ ] `session_uid` - Unique identifier for the session (convert to string for JSON)
-- [ ] `session_time` - Session timestamp in seconds
+- [x] `session_time` - Session timestamp in seconds
 - [ ] `frame_identifier` - Identifier for the frame the data was retrieved on
 - [ ] `overall_frame_identifier` - Overall identifier for the frame, including paused games
-- [ ] `player_car_index` - Index of the player's car in the arrays
+- [x] `player_car_index` - Index of the player's car in the arrays
 - [ ] `secondary_player_car_index` - Index of the secondary player's car (255 if no second player)
 
 ## II. Participant Data (For a selected car)
