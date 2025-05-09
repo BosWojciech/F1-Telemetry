@@ -66,22 +66,22 @@ Detailed setup of a specific car. Filter `m_carSetups` array.
 
 Real-time telemetry from a specific car. Filter `m_carTelemetryData` array.
 
-- [ ] `m_speed` - Speed of car in kilometres per hour
-- [ ] `m_throttle` - Amount of throttle applied (0.0 to 1.0)
-- [ ] `m_steer` - Steering input (-1.0 full lock left to 1.0 full lock right)
-- [ ] `m_brake` - Amount of brake applied (0.0 to 1.0)
-- [ ] `m_clutch` - Amount of clutch applied (0 to 100)
-- [ ] `m_gear` - Gear selected (1-8, N=0, R=-1)
-- [ ] `m_engineRPM` - Engine RPM
-- [ ] `m_drs` - DRS status: 0 = off, 1 = on
+- [x] `m_speed` - Speed of car in kilometres per hour
+- [x] `m_throttle` - Amount of throttle applied (0.0 to 1.0)
+- [x] `m_steer` - Steering input (-1.0 full lock left to 1.0 full lock right)
+- [x] `m_brake` - Amount of brake applied (0.0 to 1.0)
+- [x] `m_clutch` - Amount of clutch applied (0 to 100)
+- [x] `m_gear` - Gear selected (1-8, N=0, R=-1)
+- [x] `m_engineRPM` - Engine RPM
+- [x] `m_drs` - DRS status: 0 = off, 1 = on
 - [ ] `m_revLightsPercent` - Rev lights indicator (percentage)
 - [ ] `m_revLightsBitValue` - Rev lights (bit 0 = leftmost LED, bit 14 = rightmost LED)
-- [ ] `m_brakesTemperature` - Array of brakes temperature (Celsius) [RL, RR, FL, FR]
-- [ ] `m_tyresSurfaceTemperature` - Array of tyres surface temperature (Celsius) [RL, RR, FL, FR]
-- [ ] `m_tyresInnerTemperature` - Array of tyres inner temperature (Celsius) [RL, RR, FL, FR]
-- [ ] `m_engineTemperature` - Engine temperature (Celsius)
-- [ ] `m_tyresPressure` - Array of tyres pressure (PSI) [RL, RR, FL, FR]
-- [ ] `m_surfaceType` - Array of driving surface type for each wheel (see F1 game appendix) [RL, RR, FL, FR]
+- [x] `m_brakesTemperature` - Array of brakes temperature (Celsius) [RL, RR, FL, FR]
+- [x] `m_tyresSurfaceTemperature` - Array of tyres surface temperature (Celsius) [RL, RR, FL, FR]
+- [x] `m_tyresInnerTemperature` - Array of tyres inner temperature (Celsius) [RL, RR, FL, FR]
+- [x] `m_engineTemperature` - Engine temperature (Celsius)
+- [x] `m_tyresPressure` - Array of tyres pressure (PSI) [RL, RR, FL, FR]
+- [x] `m_surfaceType` - Array of driving surface type for each wheel (see F1 game appendix) [RL, RR, FL, FR]
 
 ### From PacketCarTelemetryData (Player/Session specific, not per-car array)
 
