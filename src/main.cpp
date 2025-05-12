@@ -64,14 +64,6 @@ int main()
 
             PacketMotionData data = maybeData.value();
 
-            uint8_t player = data.header.playerCarIndex;
-
-            std::cout << "Player Car Index: "<< player << std::endl;
-            std::cout << "X: "<< data.carMotionData[player].worldPositionX << std::endl;
-            std::cout << "Y: "<< data.carMotionData[player].worldPositionY  << std::endl;
-            std::cout << "Z: "<< data.carMotionData[player].worldPositionZ  << std::endl;
-
-
             nlohmann::json processedData = TelemetryProcessor::processPacketMotionData(data);
             ZmqPublisher::send("PacketMotionData", processedData);
             break;

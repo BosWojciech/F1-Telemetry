@@ -9,7 +9,7 @@ socket.connect("tcp://localhost:5555")
 socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
 while True:
-    os.system("clear")
+    
     message = socket.recv_string()
 
     topic, json_payload = message.split(" ", 1)
@@ -22,9 +22,10 @@ while True:
 
 
     #print(f"Received Topic: {topic}")
-    
-    #player_car_index = data_dict["header"]["playerCarIndex"]
-    #print(data_dict["cars"][player_car_index]["worldPositionX"])
-    #print(data_dict["cars"][player_car_index]["worldPositionY"])
-    #print(data_dict["cars"][player_car_index]["worldPositionZ"])
-    print(len(data_dict["cars"]))
+    print("---------------------------------------------------")
+    player_car_index = data_dict["header"]["playerCarIndex"]
+    print(data_dict["cars"][player_car_index]["worldPositionX"])
+    print(data_dict["cars"][player_car_index]["worldPositionY"])
+    print(data_dict["cars"][player_car_index]["worldPositionZ"])
+    print(player_car_index)
+    print("---------------------------------------------------")

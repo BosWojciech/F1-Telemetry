@@ -20,7 +20,7 @@ std::optional<PacketMotionData> PacketHandlers::handlePacketMotionData(ssize_t b
         return std::nullopt;
 
     PacketMotionData motionData;
-    std::memcpy(&motionData, buffer, sizeof(PACKET_MOTION_DATA_SIZE));
+    std::memcpy(&motionData, buffer, sizeof(PacketMotionData));
 
     return motionData;
     
