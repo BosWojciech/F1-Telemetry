@@ -12,6 +12,7 @@ namespace PacketHandlers
 
     // packet handlers
     std::optional<PacketMotionData> handlePacketMotionData(ssize_t bytesReceived, char *buffer);
+    std::optional<PacketSessionData> handlePacketSessionData(ssize_t bytesReceived, char *buffer);
     std::optional<PacketCarTelemetryData> handlePacketCarTelemetryData(ssize_t bytesReceived, char *buffer);
 
 }

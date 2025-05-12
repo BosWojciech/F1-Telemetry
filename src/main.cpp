@@ -70,6 +70,11 @@ int main()
         }
         case 1:
         { // PacketSessionData
+            auto maybeData = PacketHandlers::handlePacketSessionData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketSessionData data = maybeData.value();
+
             break;
         }
         case 2:

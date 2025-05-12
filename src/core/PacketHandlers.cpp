@@ -26,25 +26,12 @@ std::optional<PacketMotionData> PacketHandlers::handlePacketMotionData(ssize_t b
     
 }
 
-// PacketCarTelemetryData PacketHandlers::handlePacketCarTelemetryData(ssize_t bytesReceived, char* buffer) {
-//     if (!validatePacket(bytesReceived, PACKET_CAR_TELEMETRY_DATA_SIZE, "PacketCarTelemetryData"))
-//         return;
-
-//     PacketCarTelemetryData telemetryPacket;
-//     std::memcpy(&telemetryPacket, buffer, sizeof(PacketCarTelemetryData));
-
-//     uint8_t playerIndex = telemetryPacket.header.playerCarIndex;
-//     if (playerIndex >= 22)
-//         return;
+std::optional<PacketSessionData> PacketHandlers::handlePacketSessionData(ssize_t bytesReceived, char* buffer){
+    if(!validatePacket(bytesReceived, PACKET_SESSION_DATA_SIZE, "PacketSessionData"))
+        return std::nullopt;
     
+        PacketSessionData sessionData;
+        std::memcpy(&sessionData, buffer, sizeof(PacketSessionData));
 
-//     const CarTelemetryData &playerCar = telemetryPacket.carTelemetryData[playerIndex];
-//     std::cout << "Player Car Telemetry:" << std::endl;
-//     std::cout << "  Steer: " << playerCar.steer << std::endl;
-//     std::cout << "  Throttle: " << playerCar.throttle << std::endl;
-//     std::cout << "  Brake: " << playerCar.brake << std::endl;
-//     std::cout << "  RPM: " << playerCar.engineRPM << std::endl;
-//     std::cout << "  Gear: " << static_cast<int>(playerCar.gear) << std::endl;
-//     std::cout << "  Speed: " << playerCar.speed << "km/h" << std::endl;
-//     std::cout << "  DRS: " << static_cast<int>(playerCar.drs) << std::endl;
-// }
+        return sessionData;
+}
