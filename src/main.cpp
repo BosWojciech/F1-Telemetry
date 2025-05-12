@@ -4,13 +4,17 @@
 #include "network/udpClient.h"
 #include "core/DataTypes.h"
 #include "core/PacketHandlers.h"
+#include "core/TelemetryProcessor.h"
+#include "network/zmqPublisher.h"
 #include "nlohmann/json.hpp"
+
 
 // Define the expected size of PacketCarTelemetryData based on documentation
 
 int main()
 {
     std::cout << "Running F1 UDP Client" << std::endl;
+    ZmqPublisher::initialize();
 
     // Check structure size at runtime
     if (sizeof(PacketCarTelemetryData) != PACKET_CAR_TELEMETRY_DATA_SIZE)
@@ -55,7 +59,21 @@ int main()
         {
         case 0:
         { // PacketMotionData
-            PacketMotionData data = PacketHandlers::handlePacketMotionData(bytesReceived, buffer);
+            auto maybeData = PacketHandlers::handlePacketMotionData(bytesReceived, buffer);
+            if (!maybeData.has_value()) break;
+
+            PacketMotionData data = maybeData.value();
+
+            uint8_t player = data.header.playerCarIndex;
+
+            std::cout << "Player Car Index: "<< player << std::endl;
+            std::cout << "X: "<< data.carMotionData[player].worldPositionX << std::endl;
+            std::cout << "Y: "<< data.carMotionData[player].worldPositionY  << std::endl;
+            std::cout << "Z: "<< data.carMotionData[player].worldPositionZ  << std::endl;
+
+
+            nlohmann::json processedData = TelemetryProcessor::processPacketMotionData(data);
+            ZmqPublisher::send("PacketMotionData", processedData);
             break;
         }
         case 1:
@@ -80,7 +98,7 @@ int main()
         }
         case 6:
         { // PacketCarTelemetryData
-            PacketCarTelemetryData data = PacketHandlers::handlePacketCarTelemetryData(bytesReceived, buffer);
+            //PacketCarTelemetryData data = PacketHandlers::handlePacketCarTelemetryData(bytesReceived, buffer);
             break;
         }
         case 7:

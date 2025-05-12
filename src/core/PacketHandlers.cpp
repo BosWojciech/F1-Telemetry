@@ -1,8 +1,9 @@
 #include <iostream>
 #include <cstring>
+#include <optional>
 
-#include "PacketHandlers.h"
-#include "DataTypes.h"
+#include "core/PacketHandlers.h"
+#include "core/DataTypes.h"
 
 bool PacketHandlers::validatePacket(ssize_t bytesReceived, size_t correctSize, std::string name)
 {
@@ -14,36 +15,36 @@ bool PacketHandlers::validatePacket(ssize_t bytesReceived, size_t correctSize, s
     return true;
 }
 
-PacketMotionData PacketHandlers::handlePacketMotionData(ssize_t bytesReceived, char* buffer){
+std::optional<PacketMotionData> PacketHandlers::handlePacketMotionData(ssize_t bytesReceived, char* buffer){
     if(!validatePacket(bytesReceived, PACKET_MOTION_DATA_SIZE, "PacketMotionData"))
-        return;
+        return std::nullopt;
 
     PacketMotionData motionData;
     std::memcpy(&motionData, buffer, sizeof(PACKET_MOTION_DATA_SIZE));
 
-    // continue
+    return motionData;
     
 }
 
-PacketCarTelemetryData PacketHandlers::handlePacketCarTelemetryData(ssize_t bytesReceived, char* buffer) {
-    if (!validatePacket(bytesReceived, PACKET_CAR_TELEMETRY_DATA_SIZE, "PacketCarTelemetryData"))
-        return;
+// PacketCarTelemetryData PacketHandlers::handlePacketCarTelemetryData(ssize_t bytesReceived, char* buffer) {
+//     if (!validatePacket(bytesReceived, PACKET_CAR_TELEMETRY_DATA_SIZE, "PacketCarTelemetryData"))
+//         return;
 
-    PacketCarTelemetryData telemetryPacket;
-    std::memcpy(&telemetryPacket, buffer, sizeof(PacketCarTelemetryData));
+//     PacketCarTelemetryData telemetryPacket;
+//     std::memcpy(&telemetryPacket, buffer, sizeof(PacketCarTelemetryData));
 
-    uint8_t playerIndex = telemetryPacket.header.playerCarIndex;
-    if (playerIndex >= 22)
-        return;
+//     uint8_t playerIndex = telemetryPacket.header.playerCarIndex;
+//     if (playerIndex >= 22)
+//         return;
     
 
-    const CarTelemetryData &playerCar = telemetryPacket.carTelemetryData[playerIndex];
-    std::cout << "Player Car Telemetry:" << std::endl;
-    std::cout << "  Steer: " << playerCar.steer << std::endl;
-    std::cout << "  Throttle: " << playerCar.throttle << std::endl;
-    std::cout << "  Brake: " << playerCar.brake << std::endl;
-    std::cout << "  RPM: " << playerCar.engineRPM << std::endl;
-    std::cout << "  Gear: " << static_cast<int>(playerCar.gear) << std::endl;
-    std::cout << "  Speed: " << playerCar.speed << "km/h" << std::endl;
-    std::cout << "  DRS: " << static_cast<int>(playerCar.drs) << std::endl;
-}
+//     const CarTelemetryData &playerCar = telemetryPacket.carTelemetryData[playerIndex];
+//     std::cout << "Player Car Telemetry:" << std::endl;
+//     std::cout << "  Steer: " << playerCar.steer << std::endl;
+//     std::cout << "  Throttle: " << playerCar.throttle << std::endl;
+//     std::cout << "  Brake: " << playerCar.brake << std::endl;
+//     std::cout << "  RPM: " << playerCar.engineRPM << std::endl;
+//     std::cout << "  Gear: " << static_cast<int>(playerCar.gear) << std::endl;
+//     std::cout << "  Speed: " << playerCar.speed << "km/h" << std::endl;
+//     std::cout << "  DRS: " << static_cast<int>(playerCar.drs) << std::endl;
+// }
