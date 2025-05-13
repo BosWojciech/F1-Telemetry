@@ -103,6 +103,13 @@ int main()
         }
         case 4:
         { // PacketParticipantsData
+            auto maybeData = PacketHandlers::handlePacketParticipantsData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketParticipantsData data;
+
+            nlohmann::json processedData = TelemetryProcessor::processPacketParticipantsData(data);
+            Zmq::send("PacketParticipantsData", processedData);
             break;
         }
         case 5:

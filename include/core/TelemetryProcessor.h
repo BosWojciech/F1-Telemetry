@@ -81,6 +81,7 @@ namespace TelemetryProcessor
     static const std::unordered_map<int, std::string> penaltyTypeMap;
     static const std::unordered_map<int, std::string> infringementTypes;
     static const std::unordered_map<uint32_t, std::string> buttonFlagsMap;
+    static const std::unordered_map<int, std::string> driverIdsMap;
 
     nlohmann::json eventPacketParser(const std::string &code, const EventDataDetails &data);
     nlohmann::json processPacketHeader(const PacketHeader &header);
@@ -88,6 +89,7 @@ namespace TelemetryProcessor
     nlohmann::json processPacketSessionData(const PacketSessionData &data);
     nlohmann::json processPacketLapData(const PacketLapData &data);
     nlohmann::json processPacketEventData(const PacketEventData &data);
-
+    nlohmann::json processPacketParticipantsData(const PacketParticipantsData &data);
+    
 }
 #endif // F1TELEMETRY_TELEMETRYPROCESSOR_H

@@ -16,6 +16,7 @@ namespace PacketHandlers
     std::optional<PacketCarTelemetryData> handlePacketCarTelemetryData(ssize_t bytesReceived, char *buffer);
     std::optional<PacketLapData> handlePacketLapData(ssize_t bytesReceived, char *buffer);
     std::optional<PacketEventData> handlePacketEventData(ssize_t bytesReceived, char *buffer);
+    std::optional<PacketParticipantsData> handlePacketParticipantsData(ssize_t bytesReceived, char *buffer);
 
 }
 #endif // F1TELEMETRY_PACKET_HANDLERS_H

@@ -55,3 +55,13 @@ std::optional<PacketEventData> PacketHandlers::handlePacketEventData(ssize_t byt
 
     return eventData;
 }
+
+std::optional<PacketParticipantsData> PacketHandlers::handlePacketParticipantsData(ssize_t bytesReceived, char* buffer){
+    if(!validatePacket(bytesReceived, PACKET_PARTICIPANTS_DATA_SIZE, "PacketParticipantsData"))
+        return std::nullopt;
+    
+    PacketParticipantsData participantsData;
+    std::memcpy(&participantsData, buffer, sizeof(PacketParticipantsData));
+
+    return participantsData;
+}
