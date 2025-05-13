@@ -75,14 +75,30 @@ int main()
 
             PacketSessionData data = maybeData.value();
 
+            nlohmann::json processedData = TelemetryProcessor::processPacketSessionData(data);
+            ZmqPublisher::send("PacketSessionData", processedData);
             break;
         }
         case 2:
         { // PacketLapData
+            auto maybeData = PacketHandlers::handlePacketLapData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketLapData data = maybeData.value();
+
+            nlohmann::json processedData = TelemetryProcessor::processPacketLapData(data);
+            ZmqPublisher::send("PacketLapData", processedData);
             break;
         }
         case 3:
         { // PacketEventData
+            auto maybeData = PacketHandlers::handlePacketEventData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketEventData data = maybeData.value();
+
+            nlohmann::json processedData = TelemetryProcessor::processPacketEventData(data);
+            Zmq::send("PacketEventData", processedData);
             break;
         }
         case 4:
