@@ -107,7 +107,7 @@ Status information for a specific car. Filter `m_car_status_data` array.
 - [x] `m_drs_allowed` - DRS allowed status: 0 = not allowed, 1 = allowed, -1 = unknown
 - [x] `m_drs_activation_distance` - Distance where DRS will be available (meters); 0 if not available soon
 - [x] `m_actual_tyre_compound` - Actual tyre compound (see F1 game appendix for mapping, e.g., F1 Modern: 16=C5... 7=Inter, 8=Wet)
-- [ ] `m_visual_tyre_compound` - Visual tyre compound (see F1 game appendix, can differ from actual)
+- [x] `m_visual_tyre_compound` - Visual tyre compound (see F1 game appendix, can differ from actual)
 - [x] `m_tyres_age_laps` - Age in laps of the current set of tyres
 - [x] `m_vehicle_fia_flags` - Vehicle FIA flags: -1 = invalid/unknown, 0 = none, 1 = green, 2 = blue, 3 = yellow, 4 = red
 - [ ] `m_engine_power_ice` - Engine power output of ICE (Internal Combustion Engine) in Watts
