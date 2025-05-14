@@ -4,7 +4,7 @@
 #include "nlohmann/json.hpp"
 #include <unordered_map>
 
-#pragma region processPacketHeader
+#pragma region Header Data
 
 /**
  * @brief Converts the packet header to a JSON object.
@@ -26,7 +26,7 @@ nlohmann::json TelemetryProcessor::processPacketHeader(const PacketHeader &heade
 
 #pragma endregion
 
-#pragma region processPacketMotionData
+#pragma region Motion Data
 /**
  * @brief Converts the vehicle motion data to a JSON object.
  *
@@ -56,7 +56,7 @@ nlohmann::json TelemetryProcessor::processPacketMotionData(const PacketMotionDat
 
 #pragma endregion
 
-#pragma region processPacketSessionData
+#pragma region Session Data
 /**
  * @brief Converts the game session data to a JSON object.
  *
@@ -102,7 +102,7 @@ nlohmann::json TelemetryProcessor::processPacketSessionData(const PacketSessionD
 
 #pragma endregion
 
-#pragma region processPacketLapData
+#pragma region Lap Data
 
 /**
  * @brief Converts the lap data to a JSON object.
@@ -155,7 +155,7 @@ nlohmann::json TelemetryProcessor::processPacketLapData(const PacketLapData &dat
 
 #pragma endregion
 
-#pragma region processPacketEventData
+#pragma region Event Data
 
 /**
  * @brief Converts the event code to json containing data about event
@@ -308,7 +308,7 @@ nlohmann::json TelemetryProcessor::processPacketEventData(const PacketEventData 
 
 #pragma endregion
 
-#pragma region processPacketParticipantsData
+#pragma region Participants Data
 
 /**
  * @brief Converts the game participants data to a JSON object.
@@ -349,6 +349,223 @@ nlohmann::json TelemetryProcessor::processPacketParticipantsData(const PacketPar
 
     jsonParticipantsData["participants"] = participants;
     return jsonParticipantsData;
+}
+
+#pragma endregion
+
+#pragma region Car Telemetry
+
+/**
+ * @brief Converts the telemetry of each car to a JSON object.
+ *
+ * @param data The PacketCarTelemetry struct containing all necessary data
+ * @return A JSON object containing only selected pieces of data.
+ */
+nlohmann::json TelemetryProcessor::processPacketCarTelemetryData(const PacketCarTelemetryData &data){
+    nlohmann::json jsonTelemetryData;
+    jsonTelemetryData["header"] = processPacketHeader(data.header);
+    jsonTelemetryData["suggestedGear"] = data.suggestedGear;
+
+    nlohmann::json cars = nlohmann::json::array();
+    for(CarTelemetryData carData : data.carTelemetryData){
+        nlohmann::json telemetry;
+        telemetry["speed"] = carData.speed;
+        telemetry["throttle"] = carData.throttle;
+        telemetry["steer"] = carData.steer;
+        telemetry["brake"] = carData.brake;
+        telemetry["clutch"] = carData.clutch;
+        telemetry["gear"] = carData.gear;
+        telemetry["engineRPM"] = carData.engineRPM;
+        telemetry["drs"] = carData.drs;
+        telemetry["revLightsPercent"] = carData.revLightsPercent;
+        telemetry["revLightsBitValue"] = carData.revLightsBitValue;
+        telemetry["brakesTemperature"] = carData.brakesTemperature;
+        telemetry["tyresSurfaceTemperature"] = carData.tyresSurfaceTemperature;
+        telemetry["tyresInnerTemperature"] = carData.tyresInnerTemperature;
+        telemetry["engineTemperature"] = carData.engineTemperature;
+        telemetry["tyresPressure"] = carData.tyresPressure;
+
+        nlohmann::json surfaceType = nlohmann::json::array();
+        for(uint8_t type : carData.surfaceType){
+            std::string value = mapLookup(surfaceTypeMap, static_cast<int>(type));
+            surfaceType.push_back(value);
+        }
+        telemetry["surfaceType"] = surfaceType;
+
+        cars.push_back(telemetry);
+    }
+
+    return jsonTelemetryData;
+}
+
+ #pragma endregion
+
+
+ #pragma region Car Status
+
+/**
+ * @brief Converts the status data of each car to a JSON object.
+ *
+ * @param data The PacketCarStatusData struct containing all necessary data
+ * @return A JSON object containing only selected pieces of data.
+ */
+nlohmann::json TelemetryProcessor::processPacketCarStatusData(const PacketCarStatusData &data){
+    nlohmann::json jsonStatusData;
+    jsonStatusData["header"] = processPacketHeader(data.header);
+
+    nlohmann::json cars = nlohmann::json::array();
+    for(CarStatusData statusData : data.car_status_data){
+        nlohmann::json status;
+
+        status["frontBrakeBias"] = statusData.front_brake_bias;
+        status["pitLimiterStatus"] = mapLookup(pitLimiterStatusMap, static_cast<int>(statusData.pit_limiter_status));
+        status["fuelRemainingLaps"] = statusData.fuel_remaining_laps;
+        status["drsAllowed"] = mapLookup(drsAllowedMap, static_cast<int>(statusData.drs_allowed));
+        status["drsActivationDistance"] = statusData.drs_activation_distance;
+        status["actualTyreCompound"] = mapLookup(actualTyreCompoundMap, static_cast<int>(statusData.actual_tyre_compound));
+        status["visualTyreCompund"] = mapLookup(visualTyreCompoundMap, static_cast<int>(statusData.visual_tyre_compound));
+        status["tyresAgeLaps"] = statusData.tyres_age_laps;
+        status["vehicleFiaFlags"] = mapLookup(vehicleFiaFlagsMap, static_cast<int>(statusData.vehicle_fia_flags));
+        status["ersStoreEnergy"] = statusData.ers_store_energy;
+        status["ersDeployMode"] = mapLookup(ersDeployModeMap, static_cast<int>(statusData.ers_deploy_mode));
+        status["ersHarvestedThisLapMguk"] = statusData.ers_harvested_this_lap_mguk;
+        status["ersHarvestedThisLapMguh"] = statusData.ers_harvested_this_lap_mguh;
+        status["networkPaused"] = mapLookup(networkPausedMap, static_cast<int>(statusData.network_paused));
+
+        cars.push_back(status);
+    }
+
+    return jsonStatusData;
+}
+
+#pragma endregion
+
+#pragma region Car Damage
+
+/**
+ * @brief Converts the damage data of each car to a JSON object.
+ *
+ * @param data The PacketCarDamageData struct containing all necessary data
+ * @return A JSON object containing only selected pieces of data.
+ */
+nlohmann::json TelemetryProcessor::processPacketCarDamageData(const PacketCarDamageData &data){
+    nlohmann::json jsonDamageData;
+    jsonDamageData["header"] = processPacketHeader(data.header);
+
+
+    nlohmann::json cars = nlohmann::json::array();
+    for(const CarDamageData damageData : data.car_damage_data){
+        nlohmann::json jsonData;
+        jsonData["tyresWear"] = processWheels(damageData.tyres_wear);
+        jsonData["tyresDamage"] = processWheels(damageData.tyres_damage);
+        jsonData["brakesDamage"] = processWheels(damageData.brakes_damage);
+        jsonData["frontLeftWingDamage"] = damageData.front_left_wing_damage;
+        jsonData["frontRightWingDamage"] = damageData.front_right_wing_damage;
+        jsonData["rearWingDamage"] = damageData.rear_wing_damage;
+        jsonData["floorDamage"] = damageData.floor_damage;
+        jsonData["diffuserDamage"] = damageData.diffuser_damage;
+        jsonData["sidepodDamage"] = damageData.sidepod_damage;
+        jsonData["drsFault"] = damageData.drs_fault;
+        jsonData["ersFault"] = damageData.ers_fault;
+        jsonData["gearBoxDamage"] = damageData.gear_box_damage;
+        jsonData["engineDamage"] = damageData.engine_damage;
+        jsonData["engineMguhWear"] = damageData.engine_mguh_wear;
+        jsonData["engineEsWear"] = damageData.engine_es_wear;
+        jsonData["engineCeWear"] = damageData.engine_ce_wear;
+        jsonData["engineIceWear"] = damageData.engine_ice_wear;
+        jsonData["engineMgukWear"] = damageData.engine_mguk_wear;
+        jsonData["engineTcWear"] = damageData.engine_tc_wear;
+        jsonData["engineBlown"] = damageData.engine_blown;
+        jsonData["engineSeized"] = damageData.engine_seized;
+
+        cars.push_back(jsonData);
+    }
+
+    return jsonDamageData;
+}
+
+#pragma endregion
+
+#pragma region Session History Data
+
+/**
+ * @brief Converts the session history data to a JSON object.
+ *
+ * @param data The PacketSessionHistoryData struct containing all necessary data
+ * @return A JSON object containing only selected pieces of data.
+ */
+nlohmann::json TelemetryProcessor::processPacketSessionHistoryData(const PacketSessionHistoryData &data){
+    nlohmann::json jsonSessionHistoryData;
+    jsonSessionHistoryData["header"] = processPacketHeader(data.header);
+
+    jsonSessionHistoryData["carIdx"] = data.carIdx;
+    jsonSessionHistoryData["numLaps"] = data.numLaps;
+    jsonSessionHistoryData["numTyreStints"] = data.numTyreStints;
+    jsonSessionHistoryData["bestLapTimeLapNum"] = data.bestLapTimeLapNum;
+    jsonSessionHistoryData["bestSector1LapNum"] = data.bestSector1LapNum;
+    jsonSessionHistoryData["bestSector2LapNum"] = data.bestSector2LapNum;
+    jsonSessionHistoryData["bestSector3LapNum"] = data.bestSector3LapNum;
+    
+    nlohmann::json lapHistoryData = nlohmann::json::array();
+    for(const LapHistoryData historyData : data.lapHistoryData){
+        nlohmann::json jsonHistoryData;
+        jsonHistoryData["lapTimeInMS"] = historyData.lapTimeInMS;
+        jsonHistoryData["sector1TimeInMS"] = historyData.sector1TimeInMS;
+        jsonHistoryData["sector2TimeInMS"] = historyData.sector2TimeInMS;
+        jsonHistoryData["sector3TimeInMS"] = historyData.sector3TimeInMS;
+        jsonHistoryData["lapValidBitFlags"] = mapLookup(lapValidBitFlagsMap, historyData.lapValidBitFlags);
+        
+        lapHistoryData.push_back(jsonHistoryData);
+    }
+    jsonSessionHistoryData["lapHistoryData"] = lapHistoryData;
+
+    nlohmann::json tyreStintHistoryData;
+    for(const TyreStintHistoryData historyData : data.tyreStintsHistoryData){
+        nlohmann::json jsonHistoryData;
+        jsonHistoryData["endLap"] = historyData.endLap;
+        jsonHistoryData["tyreActualCompound"] = mapLookup(actualTyreCompoundMap, static_cast<int>(historyData.tyreActualCompound));
+        jsonHistoryData["tyreVisualCompound"] = mapLookup(visualTyreCompoundMap, static_cast<int>(historyData.tyreVisualCompound));
+        
+        tyreStintHistoryData.push_back(jsonHistoryData);
+    }
+    jsonSessionHistoryData["tyreStintHistoryData"] = tyreStintHistoryData;
+
+    return jsonSessionHistoryData;
+}
+
+#pragma endregion
+
+#pragma region Tyre Sets Data
+
+/**
+ * @brief Converts the tyre sets data of specific car to a JSON object.
+ *
+ * @param data The PacketTyreSetsData struct containing all necessary data
+ * @return A JSON object containing only selected pieces of data.
+ */
+nlohmann::json TelemetryProcessor::processPacketTyreSetsData(const PacketTyreSetsData &data){
+    nlohmann::json jsonTyreSetsData;
+    jsonTyreSetsData["header"] = processPacketHeader(data.header);
+    jsonTyreSetsData["carIdx"] = data.carIdx;
+    jsonTyreSetsData["fittedIdx"] = data.fittedIdx;
+
+    nlohmann::json tyreSets;
+    for(const TyreSetData tyreData : data.tyreSetData){
+        nlohmann::json jsonTyreData;
+        jsonTyreData["actualTyreCompound"] = mapLookup(actualTyreCompoundMap, static_cast<int>(tyreData.actualTyreCompound));
+        jsonTyreData["visualTyreCompound"] = mapLookup(visualTyreCompoundMap, static_cast<int>(tyreData.visualTyreCompound));
+        jsonTyreData["wear"] = tyreData.wear;
+        jsonTyreData["available"] = tyreData.available;
+        jsonTyreData["recommendedSession"] = tyreData.recommendedSession;
+        jsonTyreData["lifeSpan"] = tyreData.lifeSpan;
+        jsonTyreData["usableLife"] = tyreData.usableLife;
+        jsonTyreData["lapDeltatime"] = tyreData.lapDeltaTime;
+        jsonTyreData["fitted"] = tyreData.fitted;
+
+        tyreSets.push_back(jsonTyreData);
+    }
+    
+    return jsonTyreSetsData;
 }
 
 #pragma endregion

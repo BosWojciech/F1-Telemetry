@@ -98,7 +98,7 @@ int main()
             PacketEventData data = maybeData.value();
 
             nlohmann::json processedData = TelemetryProcessor::processPacketEventData(data);
-            Zmq::send("PacketEventData", processedData);
+            ZmqPublisher::send("PacketEventData", processedData);
             break;
         }
         case 4:
@@ -106,47 +106,80 @@ int main()
             auto maybeData = PacketHandlers::handlePacketParticipantsData(bytesReceived, buffer);
             if(!maybeData.has_value()) break;
 
-            PacketParticipantsData data;
+            PacketParticipantsData data = maybeData.value();
 
             nlohmann::json processedData = TelemetryProcessor::processPacketParticipantsData(data);
-            Zmq::send("PacketParticipantsData", processedData);
+            ZmqPublisher::send("PacketParticipantsData", processedData);
             break;
         }
         case 5:
         { // PacketCarSetupData
+            //skip
             break;
         }
         case 6:
         { // PacketCarTelemetryData
-            //PacketCarTelemetryData data = PacketHandlers::handlePacketCarTelemetryData(bytesReceived, buffer);
+            auto maybeData = PacketHandlers::handlePacketCarTelemetryData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketCarTelemetryData data = maybeData.value();
+            nlohmann::json processedData = TelemetryProcessor::processPacketCarTelemetryData(data);
+            ZmqPublisher::send("PacketCarTelemetryData", processedData);
             break;
         }
         case 7:
         { // PacketCarStatusData
+            auto maybeData = PacketHandlers::handlePacketCarStatusData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketCarStatusData data = maybeData.value();
+            nlohmann::json processedData = TelemetryProcessor::processPacketCarStatusData(data);
+            ZmqPublisher::send("PacketCarStatusData", processedData);
             break;
         }
         case 8:
         { // PacketFinalClassificationData
+            // skip
             break;
         }
         case 9:
         { // PacketLobbyInfoData
+            // skip
             break;
         }
         case 10:
         { // PacketCarDamageData
+            auto maybeData = PacketHandlers::handlePacketCarDamageData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketCarDamageData data = maybeData.value();
+            nlohmann::json processedData = TelemetryProcessor::processPacketCarDamageData(data);
+            ZmqPublisher::send("PacketCarDamageData", processedData);
             break;
         }
         case 11:
         { // PacketSessionHistoryData
+            auto maybeData = PacketHandlers::handlePacketSessionHistoryData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketSessionHistoryData data = maybeData.value();
+            nlohmann::json processedData = TelemetryProcessor::processPacketSessionHistoryData(data);
+            ZmqPublisher::send("PacketSessionHistoryData", processedData);
             break;
         }
         case 12:
         { // PacketTyreSetsData
+            auto maybeData = PacketHandlers::handlePacketTyreSetsData(bytesReceived, buffer);
+            if(!maybeData.has_value()) break;
+
+            PacketTyreSetsData data = maybeData.value();
+            nlohmann::json processedData = TelemetryProcessor::processPacketTyreSetsData(data);
+            ZmqPublisher::send("PacketTyreSetsData", processedData);
             break;
         }
         case 13:
         { // PacketMotionExData
+            // skip
             break;
         }
         default:

@@ -576,4 +576,76 @@ static const std::unordered_map<int, std::string> nationalityIdMap = {
     {86, "Welsh"},
     {87, "Vietnamese"}};
 
+static const std::unordered_map<int, std::string> surfaceTypeMap = {
+    {0, "Tarmac"},
+    {1, "Rumble strip"},
+    {2, "Concrete"},
+    {3, "Rock"},
+    {4, "Gravel"},
+    {5, "Mud"},
+    {6, "Sand"},
+    {7, "Grass"},
+    {8, "Water"},
+    {9, "Cobblestone"},
+    {10, "Metal"},
+    {11, "Ridged"}
+};
+
+static const std::unordered_map<int, std::string> pitLimiterStatusMap = {
+    {0, "off"},
+    {1, "on"}
+};
+
+static const std::unordered_map<int, std::string> drsAllowedMap = {
+    {-1, "unknown"},
+    {0, "not allowed"},
+    {1, "allowed"}
+};
+
+static const std::unordered_map<int, std::string> actualTyreCompoundMap = {
+    {16, "C5"},
+    {17, "C4"},
+    {18, "C3"},
+    {19, "C2"},
+    {20, "C1"},
+    {21, "C0"},
+    {7, "Inter"},
+    {8, "Wet"}
+};
+
+static const std::unordered_map<int, std::string> visualTyreCompoundMap = {
+    {16, "Soft"},
+    {17, "Medium"},
+    {18, "Hard"},
+    {7, "Inter"},
+    {8, "Wet"}
+};
+
+static const std::unordered_map<int, std::string> vehicleFiaFlagsMap = {
+    {-1, "Invalid/Unknown"},
+    {0, "None"},
+    {1, "Green"},
+    {2, "Blue"},
+    {3, "Yellow"}
+};
+
+static const std::unordered_map<int, std::string> ersDeployModeMap = {
+    {0, "None"},
+    {1, "Medium"},
+    {2, "Hotlap"},
+    {3, "Overtake"}
+};
+
+static const std::unordered_map<int, std::string> networkPausedMap = {
+    {0, "not paused"},
+    {1, "paused"}
+};
+
+static const std::unordered_map<uint8_t, std::string> lapValidBitFlagsMap = {
+    {0x01, "set-lap valid"},
+    {0x02, "set-sector 1 valid"},
+    {0x04, "set-sector 2 valid"},
+    {0x08, "set-sector 3 valid"}
+};
+
 #endif
