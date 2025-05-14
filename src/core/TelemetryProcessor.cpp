@@ -65,12 +65,11 @@ namespace TelemetryProcessor
         {30, "Miami"},
         {31, "Las Vegas"},
         {32, "Losail"}};
-    
+
     static const std::unordered_map<int, std::string> temperatureChangeMap = {
         {0, "up"},
         {1, "down"},
-        {2, "no change"}
-    };
+        {2, "no change"}};
 
     static const std::unordered_map<int, std::string> safetyCarStatusMap = {
         {0, "no safety car"},
@@ -81,19 +80,16 @@ namespace TelemetryProcessor
     static const std::unordered_map<int, std::string> TelemetryProcessor::pitStatusMap = {
         {0, "none"},
         {1, "pitting"},
-        {2, "in pit area"}
-    };
+        {2, "in pit area"}};
 
     static const std::unordered_map<int, std::string> TelemetryProcessor::sectorMap = {
         {0, "sector1"},
         {1, "sector2"},
-        {2, "sector3"}
-    };
+        {2, "sector3"}};
 
     static const std::unordered_map<int, std::string> TelemetryProcessor::lapInvalidMap = {
         {0, "valid"},
-        {1, "invalid"}
-    };
+        {1, "invalid"}};
 
     static const std::unordered_map<int, std::string> TelemetryProcessor::resultStatusMap = {
         {0, "invalid"},
@@ -103,13 +99,11 @@ namespace TelemetryProcessor
         {4, "DNF"},
         {5, "DSQ"},
         {6, "Not Classified"},
-        {7, "Retired"}
-    };
+        {7, "Retired"}};
 
     static const std::unordered_map<int, std::string> TelemetryProcessor::pitShouldServePenMap = {
         {0, "no"},
-        {1, "yes"}
-    };
+        {1, "yes"}};
 
     static const std::unordered_map<std::string, std::string> TelemetryProcessor::eventTypeMap = {
         {"SSTA", "SessionStarted"},
@@ -130,8 +124,7 @@ namespace TelemetryProcessor
         {"FLBK", "Flashback"},
         {"BUTN", "ButtonStatus"},
         {"RDFL", "RedFlag"},
-        {"OVTK", "Overtake"}
-    };
+        {"OVTK", "Overtake"}};
 
     static const std::unordered_map<int, std::string> TelemetryProcessor::penaltyTypeMap = {
         {0, "Drive Through"},
@@ -151,8 +144,7 @@ namespace TelemetryProcessor
         {14, "This And Previous Lap Invalidated"},
         {15, "This And Previous Lap Invalidated Without Reason"},
         {16, "Retired"},
-        {17, "Black Flag Timer"}
-    };
+        {17, "Black Flag Timer"}};
 
     static const std::unordered_map<int, std::string> TelemetryProcessor::infringementTypes = {
         {0, "Blocking by slow driving"},
@@ -209,10 +201,8 @@ namespace TelemetryProcessor
         {51, "Retry penalty"},
         {52, "Illegal time gain"},
         {53, "Mandatory pitstop"},
-        {54, "Attribute assigned"}
-    };
+        {54, "Attribute assigned"}};
 
-    
     static const std::unordered_map<uint32_t, std::string> buttonFlagsMap = {
         {0x00000001, "Cross or A"},
         {0x00000002, "Triangle or Y"},
@@ -245,8 +235,7 @@ namespace TelemetryProcessor
         {0x10000000, "UDP Action 9"},
         {0x20000000, "UDP Action 10"},
         {0x40000000, "UDP Action 11"},
-        {0x80000000, "UDP Action 12"}
-    };
+        {0x80000000, "UDP Action 12"}};
 
     static const std::unordered_map<int, std::string> driverIdsMap = {
         {0, "Carlos Sainz"},
@@ -379,10 +368,165 @@ namespace TelemetryProcessor
         {141, "Kamui Kobayashi"},
         {142, "Pastor Maldonado"},
         {143, "Mika Hakkinen"},
-        {144, "Nigel Mansell"}
+        {144, "Nigel Mansell"}};
+
+    static const std::unordered_map<int, std::string> TelemetryProcessor::teamIdMap = {
+        {0, "Mercedes"},
+        {1, "Ferrari"},
+        {2, "Red Bull Racing"},
+        {3, "Williams"},
+        {4, "Aston Martin"},
+        {5, "Alpine"},
+        {6, "Alpha Tauri"},
+        {7, "Haas"},
+        {8, "McLaren"},
+        {9, "Alfa Romeo"},
+        {85, "Mercedes 2020"},
+        {86, "Ferrari 2020"},
+        {87, "Red Bull 2020"},
+        {88, "Williams 2020"},
+        {89, "Racing Point 2020"},
+        {90, "Renault 2020"},
+        {91, "Alpha Tauri 2020"},
+        {92, "Haas 2020"},
+        {93, "McLaren 2020"},
+        {94, "Alfa Romeo 2020"},
+        {95, "Aston Martin DB11 V12"},
+        {96, "Aston Martin Vantage F1 Edition"},
+        {97, "Aston Martin Vantage Safety Car"},
+        {98, "Ferrari F8 Tributo"},
+        {99, "Ferrari Roma"},
+        {100, "McLaren 720S"},
+        {101, "McLaren Artura"},
+        {102, "Mercedes AMG GT Black Series Safety Car"},
+        {103, "Mercedes AMG GTR Pro"},
+        {104, "F1 Custom Team"},
+        {106, "Prema 21"},
+        {107, "Uni-Virtuosi 21"},
+        {108, "Carlin 21"},
+        {109, "Hitech 21"},
+        {110, "Art GP 21"},
+        {111, "MP Motorsport 21"},
+        {112, "Charouz 21"},
+        {113, "Dams 21"},
+        {114, "Campos 21"},
+        {115, "BWT 21"},
+        {116, "Trident 21"},
+        {117, "Mercedes AMG GT Black Series"},
+        {118, "Mercedes 22"},
+        {119, "Ferrari 22"},
+        {120, "Red Bull Racing 22"},
+        {121, "Williams 22"},
+        {122, "Aston Martin 22"},
+        {123, "Alpine 22"},
+        {124, "Alpha Tauri 22"},
+        {125, "Haas 22"},
+        {126, "McLaren 22"},
+        {127, "Alfa Romeo 22"},
+        {128, "Konnersport 22"},
+        {129, "Konnersport"},
+        {130, "Prema 22"},
+        {131, "Virtuosi 22"},
+        {132, "Carlin 22"},
+        {133, "MP Motorsport 22"},
+        {134, "Charouz 22"},
+        {135, "Dams 22"},
+        {136, "Campos 22"},
+        {137, "Van Amersfoort Racing 22"},
+        {138, "Trident 22"},
+        {139, "Hitech 22"},
+        {140, "Art GP 22"},
     };
 
-
+    static const std::unordered_map<int, std::string> TelemetryProcessor::nationalityIdMap = {
+    {1, "American"},
+    {2, "Argentinean"},
+    {3, "Australian"},
+    {4, "Austrian"},
+    {5, "Azerbaijani"},
+    {6, "Bahraini"},
+    {7, "Belgian"},
+    {8, "Bolivian"},
+    {9, "Brazilian"},
+    {10, "British"},
+    {11, "Bulgarian"},
+    {12, "Cameroonian"},
+    {13, "Canadian"},
+    {14, "Chilean"},
+    {15, "Chinese"},
+    {16, "Colombian"},
+    {17, "Costa Rican"},
+    {18, "Croatian"},
+    {19, "Cypriot"},
+    {20, "Czech"},
+    {21, "Danish"},
+    {22, "Dutch"},
+    {23, "Ecuadorian"},
+    {24, "English"},
+    {25, "Emirian"},
+    {26, "Estonian"},
+    {27, "Finnish"},
+    {28, "French"},
+    {29, "German"},
+    {30, "Ghanaian"},
+    {31, "Greek"},
+    {32, "Guatemalan"},
+    {33, "Honduran"},
+    {34, "Hong Konger"},
+    {35, "Hungarian"},
+    {36, "Icelander"},
+    {37, "Indian"},
+    {38, "Indonesian"},
+    {39, "Irish"},
+    {40, "Israeli"},
+    {41, "Italian"},
+    {42, "Jamaican"},
+    {43, "Japanese"},
+    {44, "Jordanian"},
+    {45, "Kuwaiti"},
+    {46, "Latvian"},
+    {47, "Lebanese"},
+    {48, "Lithuanian"},
+    {49, "Luxembourger"},
+    {50, "Malaysian"},
+    {51, "Maltese"},
+    {52, "Mexican"},
+    {53, "Monegasque"},
+    {54, "New Zealander"},
+    {55, "Nicaraguan"},
+    {56, "Northern Irish"},
+    {57, "Norwegian"},
+    {58, "Omani"},
+    {59, "Pakistani"},
+    {60, "Panamanian"},
+    {61, "Paraguayan"},
+    {62, "Peruvian"},
+    {63, "Polish"},
+    {64, "Portuguese"},
+    {65, "Qatari"},
+    {66, "Romanian"},
+    {67, "Russian"},
+    {68, "Salvadoran"},
+    {69, "Saudi"},
+    {70, "Scottish"},
+    {71, "Serbian"},
+    {72, "Singaporean"},
+    {73, "Slovakian"},
+    {74, "Slovenian"},
+    {75, "South Korean"},
+    {76, "South African"},
+    {77, "Spanish"},
+    {78, "Swedish"},
+    {79, "Swiss"},
+    {80, "Thai"},
+    {81, "Turkish"},
+    {82, "Uruguayan"},
+    {83, "Ukrainian"},
+    {84, "Venezuelan"},
+    {85, "Barbadian"},
+    {86, "Welsh"},
+    {87, "Vietnamese"}
+};
 
     nlohmann::json processPacketHeader(const PacketHeader &header)
     {
@@ -431,9 +575,10 @@ namespace TelemetryProcessor
         jsonSessionData["sessionDuration"] = data.sessionDuration;
         jsonSessionData["safetyCarStatus"] = mapLookup(safetyCarStatusMap, static_cast<int>(data.safetyCarStatus));
         jsonSessionData["numWeatherForecastSamples"] = data.numWeatherForecastSamples;
-        
+
         nlohmann::json weatherArray = nlohmann::json::array();
-        for(const WeatherForecastSample& weatherData : data.weatherForecastSamples){
+        for (const WeatherForecastSample &weatherData : data.weatherForecastSamples)
+        {
             nlohmann::json weatherForecastSample;
             weatherForecastSample["sessionType"] = mapLookup(sessionTypeMap, static_cast<int>(weatherData.sessionType));
             weatherForecastSample["timeOffset"] = weatherData.timeOffset;
@@ -453,13 +598,15 @@ namespace TelemetryProcessor
         return jsonSessionData;
     }
 
-    nlohmann::json TelemetryProcessor::processPacketLapData(const PacketLapData &data){
+    nlohmann::json TelemetryProcessor::processPacketLapData(const PacketLapData &data)
+    {
         nlohmann::json jsonLapData;
         jsonLapData["header"] = processPacketHeader(data.header);
 
         nlohmann::json carsData = nlohmann::json::array();
 
-        for(const LapData& lapData : data.lapData){
+        for (const LapData &lapData : data.lapData)
+        {
             nlohmann::json specificLapData;
             specificLapData["lastLapTimeInMS"] = lapData.lastLapTimeInMS;
             specificLapData["currentLapTimeInMS"] = lapData.currentLapTimeInMS;
@@ -487,147 +634,175 @@ namespace TelemetryProcessor
 
             carsData.push_back(specificLapData);
         }
-        
+
         jsonLapData["cars"] = carsData;
         jsonLapData["timeTrialPBCarIdx"] = data.timeTrialPBCarIdx;
 
         return jsonLapData;
     }
 
-    nlohmann::json TelemetryProcessor::eventPacketParser(const std::string &code, const EventDataDetails &data){
+    nlohmann::json TelemetryProcessor::eventPacketParser(const std::string &code, const EventDataDetails &data)
+    {
         EventType event = eventTypeFromCode(code);
         nlohmann::json payload;
 
-        switch(event){
-            case EventType::SessionStarted:{
-                payload["data"] = true;
-                return payload;
-            }
-            case EventType::SessionEnded:{
-                payload["data"] = true;
-                return payload;
-            }
-            case EventType::FastestLap:{
-                payload["vehicleIdx"] = data.FastestLap.vehicleIdx;
-                payload["lapTime"] = data.FastestLap.lapTime;
-                return payload;
-            }
-            case EventType::Retirement:{
-                payload["vehicleIdx"] = data.Retirement.vehicleIdx;
-                return payload;
-            }
-            case EventType::DRSEnabled:{
-                payload["data"] = true;
-                return payload;
-            }
-            case EventType::DRSDisabled:{
-                payload["data"] = true;
-                return payload;
-            }
-            case EventType::TeamMateInPits:{
-                payload["vehicleIdx"] = data.TeamMateInPits.vehicleIdx;
-                return payload;
-            }
-            case EventType::ChequeredFlag:{
-                payload["data"] = true;
-                return payload;
-            }
-            case EventType::RaceWinner:{
-                payload["vehicleIdx"] = data.RaceWinner.vehicleIdx;
-                return payload;
-            }
-            case EventType::PenaltyIssued:{
-                payload["penaltyType"] = mapLookup(penaltyTypeMap, static_cast<int>(data.Penalty.penaltyType));
-                payload["infringementType"] = mapLookup(infringementTypes, static_cast<int>(data.Penalty.infringementType));
-                payload["vehicleIdx"] = data.Penalty.vehicleIdx;
-                payload["otherVehicleIdx"] = data.Penalty.otherVehicleIdx;
-                payload["timeGained"] = data.Penalty.time;
-                payload["lapNum"] = data.Penalty.lapNum;
-                payload["placesGained"] = data.Penalty.placesGained;
-                return payload;
-            }
-            case EventType::SpeedTrapTriggered:{
-                payload["vehicleIdx"] = data.SpeedTrap.vehicleIdx;
-                payload["speed"] = data.SpeedTrap.speed;
-                payload["isOverallFastestInSession"] = data.SpeedTrap.isOverallFastestInSession;
-                payload["isDriverFastestInSession"] = data.SpeedTrap.isDriverFastestInSession;
-                payload["fastestVehicleIdxInSession"] = data.SpeedTrap.fastestVehicleIdxInSession;
-                payload["fastestSpeedInSession"] = data.SpeedTrap.fastestSpeedInSession;
-                return payload;
-            }
-            case EventType::StartLight:{
-                payload["numLights"] = data.StartLights.numLights;
-                return payload;
-            }
-            case EventType::LightsOut:{
-                payload["data"] = true;
-                return payload;
-            }
-            case EventType::DriveThroughServed:{
-                payload["vehicleIdx"] = data.DriveThroughPenaltyServed.vehicleIdx;
-                return payload;
-            }
-            case EventType::StopGoServed:{
-                payload["vehicleIdx"] = data.StopGoPenaltyServed.vehicleIdx;
-                return payload;
-            }
-            case EventType::Flashback:{
-                payload["flashbackFrameIdentifier"] = data.Flashback.flashbackFrameIdentifier;
-                payload["flashbackSessionTime"] = data.Flashback.flashbackSessionTime;
-                return payload;
-            }
-            case EventType::ButtonStatus:{
-                payload["button"] = mapLookup(buttonFlagsMap, data.Buttons.buttonStatus);
-                return payload;
-            }
-            case EventType::RedFlag:{
-                payload["data"] = true;
-                return payload;
-            }
-            case EventType::Overtake:{
-                payload["overtakingVehicleIdx"] = data.Overtake.overtakingVehicleIdx;
-                payload["beingOvertakenVehicleIdx"] = data.Overtake.beingOvertakenVehicleIdx;
-                return payload;
-            }
-            default:{
-                payload["Unknown"] = "Unknown";
-                return payload;
-            }
+        switch (event)
+        {
+        case EventType::SessionStarted:
+        {
+            payload["data"] = true;
+            return payload;
+        }
+        case EventType::SessionEnded:
+        {
+            payload["data"] = true;
+            return payload;
+        }
+        case EventType::FastestLap:
+        {
+            payload["vehicleIdx"] = data.FastestLap.vehicleIdx;
+            payload["lapTime"] = data.FastestLap.lapTime;
+            return payload;
+        }
+        case EventType::Retirement:
+        {
+            payload["vehicleIdx"] = data.Retirement.vehicleIdx;
+            return payload;
+        }
+        case EventType::DRSEnabled:
+        {
+            payload["data"] = true;
+            return payload;
+        }
+        case EventType::DRSDisabled:
+        {
+            payload["data"] = true;
+            return payload;
+        }
+        case EventType::TeamMateInPits:
+        {
+            payload["vehicleIdx"] = data.TeamMateInPits.vehicleIdx;
+            return payload;
+        }
+        case EventType::ChequeredFlag:
+        {
+            payload["data"] = true;
+            return payload;
+        }
+        case EventType::RaceWinner:
+        {
+            payload["vehicleIdx"] = data.RaceWinner.vehicleIdx;
+            return payload;
+        }
+        case EventType::PenaltyIssued:
+        {
+            payload["penaltyType"] = mapLookup(penaltyTypeMap, static_cast<int>(data.Penalty.penaltyType));
+            payload["infringementType"] = mapLookup(infringementTypes, static_cast<int>(data.Penalty.infringementType));
+            payload["vehicleIdx"] = data.Penalty.vehicleIdx;
+            payload["otherVehicleIdx"] = data.Penalty.otherVehicleIdx;
+            payload["timeGained"] = data.Penalty.time;
+            payload["lapNum"] = data.Penalty.lapNum;
+            payload["placesGained"] = data.Penalty.placesGained;
+            return payload;
+        }
+        case EventType::SpeedTrapTriggered:
+        {
+            payload["vehicleIdx"] = data.SpeedTrap.vehicleIdx;
+            payload["speed"] = data.SpeedTrap.speed;
+            payload["isOverallFastestInSession"] = data.SpeedTrap.isOverallFastestInSession;
+            payload["isDriverFastestInSession"] = data.SpeedTrap.isDriverFastestInSession;
+            payload["fastestVehicleIdxInSession"] = data.SpeedTrap.fastestVehicleIdxInSession;
+            payload["fastestSpeedInSession"] = data.SpeedTrap.fastestSpeedInSession;
+            return payload;
+        }
+        case EventType::StartLight:
+        {
+            payload["numLights"] = data.StartLights.numLights;
+            return payload;
+        }
+        case EventType::LightsOut:
+        {
+            payload["data"] = true;
+            return payload;
+        }
+        case EventType::DriveThroughServed:
+        {
+            payload["vehicleIdx"] = data.DriveThroughPenaltyServed.vehicleIdx;
+            return payload;
+        }
+        case EventType::StopGoServed:
+        {
+            payload["vehicleIdx"] = data.StopGoPenaltyServed.vehicleIdx;
+            return payload;
+        }
+        case EventType::Flashback:
+        {
+            payload["flashbackFrameIdentifier"] = data.Flashback.flashbackFrameIdentifier;
+            payload["flashbackSessionTime"] = data.Flashback.flashbackSessionTime;
+            return payload;
+        }
+        case EventType::ButtonStatus:
+        {
+            payload["button"] = mapLookup(buttonFlagsMap, data.Buttons.buttonStatus);
+            return payload;
+        }
+        case EventType::RedFlag:
+        {
+            payload["data"] = true;
+            return payload;
+        }
+        case EventType::Overtake:
+        {
+            payload["overtakingVehicleIdx"] = data.Overtake.overtakingVehicleIdx;
+            payload["beingOvertakenVehicleIdx"] = data.Overtake.beingOvertakenVehicleIdx;
+            return payload;
+        }
+        default:
+        {
+            payload["Unknown"] = "Unknown";
+            return payload;
+        }
         }
     }
 
-    nlohmann::json TelemetryProcessor::processPacketEventData(const PacketEventData &data){
+    nlohmann::json TelemetryProcessor::processPacketEventData(const PacketEventData &data)
+    {
         nlohmann::json jsonEventData;
         jsonEventData["header"] = processPacketHeader(data.header);
 
-        std::string eventCode = std::string(reinterpret_cast<const char*>(data.eventStringCode), 4);
+        std::string eventCode = std::string(reinterpret_cast<const char *>(data.eventStringCode), 4);
         jsonEventData["type"] = mapLookup(eventTypeMap, eventCode);
 
         jsonEventData["payload"] = eventPacketParser(eventCode, data.eventDetails);
         return jsonEventData;
     }
 
-    nlohmann::json TelemetryProcessor::processPacketParticipantsData(const PacketParticipantsData &data){
+    nlohmann::json TelemetryProcessor::processPacketParticipantsData(const PacketParticipantsData &data)
+    {
         nlohmann::json jsonParticipantsData;
         jsonParticipantsData["header"] = processPacketHeader(data.header);
         jsonParticipantsData["numActiveCars"] = data.numActiveCars;
 
         nlohmann::json participants = nlohmann::json::array();
 
-        for(const ParticipantData& participantData : data.participants){
+        for (const ParticipantData &participantData : data.participants)
+        {
             nlohmann::json participant;
 
-            if(participantData.driverId == 255){
+            if (participantData.driverId == 255)
+            {
                 participant["driverName"] = mapLookup(driverIdsMap, static_cast<int>(participantData.driverId));
-                participant["teamId"] = participantData.teamId; //map lookup
+                participant["teamId"] = mapLookup(teamIdMap, static_cast<int>(participantData.teamId));
                 participant["carRaceNumber"] = participantData.raceNumber;
-                participant["nationality"] = participantData.nationality; // map lookup
-            } else{
+                participant["nationality"] = mapLookup(nationalityIdMap, static_cast<int>(participantData.nationality));
+            }
+            else
+            {
                 participant["driverName"] = participantData.name;
                 participant["networkId"] = participantData.networkId;
-                participant["teamId"] = participantData.teamId; //map lookup
+                participant["teamId"] = mapLookup(teamIdMap, static_cast<int>(participantData.teamId));
                 participant["carRaceNumber"] = participantData.raceNumber;
-                participant["nationality"] = participantData.nationality; // map lookup
+                participant["nationality"] = mapLookup(nationalityIdMap, static_cast<int>(participantData.nationality));
             }
 
             participants.push_back(participant);
