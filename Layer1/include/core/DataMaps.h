@@ -56,6 +56,23 @@ EventType eventTypeFromCode(const std::string &code)
     return it != eventMap.end() ? it->second : EventType::Unknown;
 }
 
+static const std::unordered_map<int, std::string> packetTypeMap = {
+    {0, "PacketMotionData"},
+    {1, "PacketSessionData"},
+    {2, "PacketLapData"},
+    {3, "PacketEventData"},
+    {4, "PacketParticipantsData"},
+    {5, "PacketCarSetupData"},
+    {6, "PacketCarTelemetryData"},
+    {7, "PacketCarStatusData"},
+    {8, "PacketFinalClassificationData"},
+    {9, "PacketLobbyInfoData"},
+    {10, "PacketCarDamageData"},
+    {11, "PacketSessionHistoryData"},
+    {12, "PacketTyreSetsData"},
+    {13, "PacketMotionExData"}
+};
+
 static const std::unordered_map<int, std::string> weatherMap = {
     {0, "clear"},
     {1, "light cloud"},
