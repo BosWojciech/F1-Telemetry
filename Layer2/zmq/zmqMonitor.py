@@ -1,15 +1,7 @@
 import json
 import threading
 import zmq
-import keyboard
 
-def key_listener():
-    global running
-    keyboard.wait('q')
-    print("\n[INFO] 'q' pressed. Exiting...")
-    running = False
-    
-threading.Thread(target=key_listener, daemon=True).start()
 
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
@@ -50,7 +42,7 @@ while True:
     msg = socket.recv_string()
     
     try:
-        topic, payload = msg.split('', 1)
+        topic, payload = msg.split(' ', 1)
         parsed = json.loads(payload)
         print(f"\n[{topic}]\n" + json.dumps(parsed, indent=2))
     except Exception as e:

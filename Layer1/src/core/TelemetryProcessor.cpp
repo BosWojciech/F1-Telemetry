@@ -394,6 +394,7 @@ nlohmann::json TelemetryProcessor::processPacketCarTelemetryData(const PacketCar
 
         cars.push_back(telemetry);
     }
+    jsonTelemetryData["cars"] = cars;
 
     return jsonTelemetryData;
 }
@@ -434,6 +435,7 @@ nlohmann::json TelemetryProcessor::processPacketCarStatusData(const PacketCarSta
 
         cars.push_back(status);
     }
+    jsonStatusData["cars"] = cars;
 
     return jsonStatusData;
 }
@@ -480,6 +482,7 @@ nlohmann::json TelemetryProcessor::processPacketCarDamageData(const PacketCarDam
 
         cars.push_back(jsonData);
     }
+    jsonDamageData["cars"] = cars;
 
     return jsonDamageData;
 }
@@ -549,7 +552,7 @@ nlohmann::json TelemetryProcessor::processPacketTyreSetsData(const PacketTyreSet
     jsonTyreSetsData["carIdx"] = data.carIdx;
     jsonTyreSetsData["fittedIdx"] = data.fittedIdx;
 
-    nlohmann::json tyreSets;
+    nlohmann::json tyreSets = nlohmann::json::array();
     for(const TyreSetData tyreData : data.tyreSetData){
         nlohmann::json jsonTyreData;
         jsonTyreData["actualTyreCompound"] = mapLookup(actualTyreCompoundMap, static_cast<int>(tyreData.actualTyreCompound));
@@ -564,6 +567,7 @@ nlohmann::json TelemetryProcessor::processPacketTyreSetsData(const PacketTyreSet
 
         tyreSets.push_back(jsonTyreData);
     }
+    jsonTyreSetsData["tyreSets"] = tyreSets;
     
     return jsonTyreSetsData;
 }
