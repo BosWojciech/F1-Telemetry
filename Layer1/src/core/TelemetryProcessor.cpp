@@ -16,7 +16,7 @@ nlohmann::json TelemetryProcessor::processPacketHeader(const PacketHeader &heade
 {
     nlohmann::json jsonHeader;
     jsonHeader["gameYear"] = header.gameYear;
-    jsonHeader["packetId"] = header.packetId;
+    jsonHeader["packetId"] = mapLookup(packetTypeMap, static_cast<int>(header.packetId));
     jsonHeader["sessionUID"] = header.sessionUID;
     jsonHeader["sessionTime"] = header.sessionTime;
     jsonHeader["playerCarIndex"] = header.playerCarIndex;
@@ -110,48 +110,40 @@ nlohmann::json TelemetryProcessor::processPacketSessionData(const PacketSessionD
  * @param data The PacketLapData struct containing all necessary data
  * @return A JSON object containing only selected pieces of data.
  */
-nlohmann::json TelemetryProcessor::processPacketLapData(const PacketLapData &data)
-{
-    nlohmann::json jsonLapData;
-    jsonLapData["header"] = processPacketHeader(data.header);
 
-    nlohmann::json carsData = nlohmann::json::array();
+export type CarLapData = {
+  lastLapTimeInMS: number;
+  currentLapTimeInMS: number;
+  sector1TimeInMS: number;
+  sector2TimeInMS: number;
+  deltaToCarInFrontInMS: number;
+  deltaToRaceLeaderInMS: number;
+  safetCarDelta: number;
+  carPosition: number;
+  currentLapNum: number;
+  pitStatus: string;
+  numPitStops: number;
+  sector: string;
+  currentLapInvalid: string;
+  penalties: number;
+  totalWarnings: number;
+  cornerCuttingWarnings: number;
+  numUnservedDriveThroughPens: number;
+  numUnservedStopGoPens: number;
+  gridPosition: number;
+  resultStatus: string;
+  pitLaneTimeInLaneInMS: number;
+  pitStopTimerInMS: number;
+  pitStopShouldServePen: string;
+};
 
-    for (const LapData &lapData : data.lapData)
-    {
-        nlohmann::json specificLapData;
-        specificLapData["lastLapTimeInMS"] = lapData.lastLapTimeInMS;
-        specificLapData["currentLapTimeInMS"] = lapData.currentLapTimeInMS;
-        specificLapData["sector1TimeInMS"] = lapData.sector1TimeInMS;
-        specificLapData["sector2TimeInMS"] = lapData.sector2TimeInMS;
-        specificLapData["deltaToCarInFrontInMS"] = lapData.deltaToCarInFrontInMS;
-        specificLapData["deltaToRaceLeaderInMS"] = lapData.deltaToRaceLeaderInMS;
-        specificLapData["safetCarDelta"] = lapData.safetyCarDelta;
-        specificLapData["carPosition"] = lapData.carPosition;
-        specificLapData["currentLapNum"] = lapData.currentLapNum;
-        specificLapData["pitStatus"] = mapLookup(pitStatusMap, static_cast<int>(lapData.pitStatus));
-        specificLapData["numPitStops"] = lapData.numPitStops;
-        specificLapData["sector"] = mapLookup(sectorMap, static_cast<int>(lapData.sector));
-        specificLapData["currentLapInvalid"] = mapLookup(lapInvalidMap, static_cast<int>(lapData.currentLapInvalid));
-        specificLapData["penalties"] = lapData.penalties;
-        specificLapData["totalWarnings"] = lapData.totalWarnings;
-        specificLapData["cornerCuttingWarnings"] = lapData.cornerCuttingWarnings;
-        specificLapData["numUnservedDriveThroughPens"] = lapData.numUnservedDriveThroughPens;
-        specificLapData["numUnservedStopGoPens"] = lapData.numUnservedStopGoPens;
-        specificLapData["gridPosition"] = lapData.gridPosition;
-        specificLapData["resultStatus"] = mapLookup(resultStatusMap, static_cast<int>(lapData.resultStatus));
-        specificLapData["pitLaneTimeInLaneInMS"] = lapData.pitLaneTimeInLaneInMS;
-        specificLapData["pitStopTimerInMS"] = lapData.pitStopTimerInMS;
-        specificLapData["pitStopShouldServePen"] = mapLookup(pitShouldServePenMap, static_cast<int>(lapData.pitStopShouldServePen));
-
-        carsData.push_back(specificLapData);
-    }
-
-    jsonLapData["cars"] = carsData;
-    jsonLapData["timeTrialPBCarIdx"] = data.timeTrialPBCarIdx;
-
-    return jsonLapData;
-}
+export type PacketLapData = {
+  header: PacketHeader;
+  cars: CarLapData[];
+  timeTrialPBCarIdx: number;
+  layer1Timestamp: number;
+  layer2Timestamp: number;
+};
 
 #pragma endregion
 
