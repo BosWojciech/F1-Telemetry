@@ -1,7 +1,7 @@
 import json
 import threading
 import zmq
-
+import time
 
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
@@ -47,8 +47,10 @@ while True:
 
         topic = parts[0].decode("utf-8")
         payload = json.loads(parts[1].decode("utf-8"))
-
+        latency_ms = time.time() * 1000 - payload["layer1Timestamp"]
         print(f"\n[{topic}]\n" + json.dumps(payload, indent=2))
+        print(f"LATENCY: {latency_ms}")
+
     except Exception as e:
         print(f"Error: {e}")
 
