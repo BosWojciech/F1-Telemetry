@@ -39,14 +39,18 @@ print()
 
 
 while True:
-    msg = socket.recv_string()
-    
     try:
-        topic, payload = msg.split(' ', 1)
-        parsed = json.loads(payload)
-        print(f"\n[{topic}]\n" + json.dumps(parsed, indent=2))
+        parts = socket.recv_multipart()
+        if len(parts) != 2:
+            print(f"Unexpected multipart message: {parts}")
+            continue
+
+        topic = parts[0].decode("utf-8")
+        payload = json.loads(parts[1].decode("utf-8"))
+
+        print(f"\n[{topic}]\n" + json.dumps(payload, indent=2))
     except Exception as e:
         print(f"Error: {e}")
-        print(f"RAW: {msg}")
+
 
 

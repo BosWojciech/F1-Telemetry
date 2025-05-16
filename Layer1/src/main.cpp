@@ -14,7 +14,7 @@
 int main()
 {
     std::cout << "Running F1 UDP Client" << std::endl;
-    ZmqPublisher::initialize();
+    ZmqPublisher::initialize("tcp://*:5555");
 
     // Check structure size at runtime
     if (sizeof(PacketCarTelemetryData) != PACKET_CAR_TELEMETRY_DATA_SIZE)
@@ -189,5 +189,6 @@ int main()
         }
     }
 
+    ZmqPublisher::shutdown();
     return 0;
 }
