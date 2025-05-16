@@ -29,7 +29,7 @@ void ZmqPublisher::send(const std::string& topic, nlohmann::json& payload) {
             now.time_since_epoch()).count();
 
         payload["layer1Timestamp"] = millis;
-
+        std::cout << "[" << topic << "]: Sending payload" << std::endl;
         ZmqPublisher::publisher.send(zmq::buffer(topic), zmq::send_flags::sndmore);
         ZmqPublisher::publisher.send(zmq::buffer(payload.dump()), zmq::send_flags::none);
     } catch (const zmq::error_t& e) {
