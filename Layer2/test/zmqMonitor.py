@@ -1,10 +1,10 @@
 import json
 import threading
-import zmq
+import zmq_client
 import time
 
-context = zmq.Context()
-socket = context.socket(zmq.SUB)
+context = zmq_client.Context()
+socket = context.socket(zmq_client.SUB)
 
 address = input("Input address of ZMQ publisher: ")
 if address == "": 
@@ -33,7 +33,7 @@ print()
 
 for choice in choices:
     choice = int(choice) - 1
-    socket.setsockopt_string(zmq.SUBSCRIBE, topics[choice])
+    socket.setsockopt_string(zmq_client.SUBSCRIBE, topics[choice])
     print(f"Subscribed to {topics[choice]}")
 print()
 

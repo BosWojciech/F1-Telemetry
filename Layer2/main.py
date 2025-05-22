@@ -1,7 +1,7 @@
 import argparse
 import copy
-from zmq.zmq_client import ZmqClient
-from websocket.websocket_server import WebSocketServer
+from zmq_client.zmq_client import ZmqClient
+from websocket_server.websocket_server import WebSocketServer
 import time
 import asyncio
 
@@ -30,7 +30,7 @@ async def main():
     parser = argparse.ArgumentParser(description="Telemetry system main entry point.")
     parser.add_argument(
         "mode",
-        choices=["datacollection", "passthroughmode"],
+        choices=["datacollection", "passthrough"],
         help="Mode to run the program in. Choose 'datacollection' or 'passthroughmode'."
     )
 
