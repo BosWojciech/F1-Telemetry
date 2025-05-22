@@ -1,73 +1,61 @@
 import asyncio
-import json
+import threading
 import websockets
-from websockets.server import WebSocketServerProtocol
-import logging
 
-class WebSocketServer:
-    def __init__(self, host: str = "localhost", port: int = 8765):
+class WebsocketServer:
+    def __init__(self, host="0.0.0.0", port=8765):
         self.host = host
         self.port = port
-        self.clients: set[WebSocketServerProtocol] = set()
+        self.clients = set()
+        self.loop = None
         self.server = None
+        self.queue = asyncio.Queue()
+        self.thread = threading.Thread(target=self._start_loop, daemon=True)
 
-    async def handler(self, websocket: WebSocketServerProtocol):
+    def start(self):
+        self.thread.start()
+
+    def _start_loop(self):
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+
+        async def start_server():
+            print(f"Starting server on {self.host}:{self.port} with handler: {self._handler}")
+
+            server = await websockets.serve(self._handler, self.host, self.port)
+            print(f"WebSocket Server started at ws://{self.host}:{self.port}")
+
+            self.loop.create_task(self._broadcast_from_queue())
+
+            return server
+
+        self.server = self.loop.run_until_complete(start_server())
+
+        self.loop.run_forever()
+
+
+    async def _handler(self, websocket):
+
         self.clients.add(websocket)
         print(f"Client connected: {websocket.remote_address}")
         try:
-            # Wait for the connection to close (send-only server)
-            await websocket.wait_closed()
-        except Exception as e:
-            print(f"Error with client {websocket.remote_address}: {e}")
+            async for _ in websocket:
+                pass
+        except websockets.ConnectionClosed:
+            print(f"Client disconnected: {websocket.remote_address}")
         finally:
-            self.clients.discard(websocket)
-            print(f"Client removed: {websocket.remote_address}")
+            self.clients.remove(websocket)
 
-    async def start(self):
-        """Start the WebSocket server and keep it running"""
-        print(f"Starting WebSocket server on ws://{self.host}:{self.port}")
-        
-        async with websockets.serve(self.handler, self.host, self.port) as server:
-            self.server = server
-            print(f"WebSocket server is running on ws://{self.host}:{self.port}")
-            
-            await asyncio.Future()
+    async def _broadcast_from_queue(self):
+        while True:
+            data = await self.queue.get()
+            if self.clients:
+                await asyncio.gather(*(client.send(data) for client in self.clients))
 
-    async def send_to_all(self, message: dict):
-        """Send message to all connected clients"""
-        if not self.clients:
-            print("No clients connected, skipping message send")
-            return
-        
-        data = json.dumps(message)
-        print(f"Sending message to {len(self.clients)} clients: {data[:100]}...")
-        
-        send_tasks = []
-        disconnected_clients = []
-        
-        for client in self.clients.copy():
-            if client.open:
-                send_tasks.append(self.send_to_client(client, data))
-            else:
-                disconnected_clients.append(client)
-        
-        for client in disconnected_clients:
-            self.clients.discard(client)
-        
-        if send_tasks:
-            results = await asyncio.gather(*send_tasks, return_exceptions=True)
-            
-            for i, result in enumerate(results):
-                if isinstance(result, Exception):
-                    print(f"Error sending to client: {result}")
 
-    async def send_to_client(self, client: WebSocketServerProtocol, data: str):
-        """Send data to a specific client with error handling"""
-        try:
-            await client.send(data)
-        except websockets.exceptions.ConnectionClosed:
-            print(f"Client {client.remote_address} connection closed during send")
-            self.clients.discard(client)
-        except Exception as e:
-            print(f"Error sending to client {client.remote_address}: {e}")
-            self.clients.discard(client)
+    def send(self, data):
+        if self.loop and self.loop.is_running():
+            asyncio.run_coroutine_threadsafe(self.queue.put(data), self.loop)
+        else:
+            print("Event loop not running, can't send data")
+

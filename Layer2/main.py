@@ -1,9 +1,9 @@
 import argparse
 import copy
 from zmq_client.zmq_client import ZmqClient
-from websocket_server.websocket_server import WebSocketServer
+from websocket_server.websocket_server import WebsocketServer
 import time
-import asyncio
+import json
 
 DATA_COLLECTION_MODE = False
 TOPICS = [
@@ -26,38 +26,8 @@ def clean_payload(payload: dict) -> dict:
     cleaned.pop("layer1Timestamp", None)
     return cleaned
 
-async def process_zmq_data(zmq_client, ws_server, last_payloads):
-    """Process ZMQ data in a separate async task"""
-    while True:
-        try:
-            # Small delay to prevent blocking the event loop
-            await asyncio.sleep(0.001)  # 1ms delay
-            
-            topic, payload = zmq_client.captureData()
 
-            if topic is None or payload is None:
-                continue
-
-            cleaned_payload = clean_payload(payload)
-
-            if topic not in last_payloads or last_payloads[topic] != cleaned_payload:
-                last_payloads[topic] = copy.deepcopy(cleaned_payload)
-                payload["layer2Timestamp"] = int(time.time() * 1000)
-
-                print(f"Forwarding updated packet for topic: {topic}")
-                await ws_server.send_to_all({topic: payload})
-
-                if DATA_COLLECTION_MODE:
-                    # TODO: store to database
-                    pass
-            else:
-                print(f"Skipping unchanged packet for topic: {topic}")
-
-        except Exception as e:
-            print(f"Error processing ZMQ data: {e}")
-            await asyncio.sleep(0.1)  # Wait before retrying
-
-async def main():
+def main():
     parser = argparse.ArgumentParser(description="Telemetry system main entry point.")
     parser.add_argument(
         "mode",
@@ -77,20 +47,42 @@ async def main():
     zmq.connect()
     zmq.subscribe()
 
-    ws = WebSocketServer(port=8765)
+    ws_server = WebsocketServer()
+    ws_server.start()
     
     last_payloads: dict[str, dict] = {}
 
-    try:
-        await asyncio.gather(
-            ws.start(),
-            process_zmq_data(zmq, ws, last_payloads)
-        )
-    except KeyboardInterrupt:
-        print("Shutting down...")
-    except Exception as e:
-        print(f"Error in main: {e}")
+    while True:
+        try:
+            topic, payload = zmq.captureData()
+
+            if topic is None or payload is None:
+                continue
+
+            cleaned_payload = clean_payload(payload)
+
+            if topic not in last_payloads or last_payloads[topic] != cleaned_payload:
+                last_payloads[topic] = copy.deepcopy(cleaned_payload)
+                payload["layer2Timestamp"] = int(time.time() * 1000)
+
+                print(f"Forwarding updated packet for topic: {topic}")
+                data_to_send = json.dumps({
+                    "topic": topic,
+                    "payload": payload,
+                })
+
+                ws_server.send(data_to_send)
+
+                if DATA_COLLECTION_MODE:
+                    # TODO: store to database
+                    pass
+            else:
+                print(f"Skipping unchanged packet for topic: {topic}")
+
+        except Exception as e:
+            print(f"Error processing ZMQ data: {e}")
+    
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
     print("Shutting down...")
