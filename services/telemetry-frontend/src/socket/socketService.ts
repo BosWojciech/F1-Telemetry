@@ -8,7 +8,7 @@
 class SocketService {
     private ws: WebSocket | null = null; // Stores the WebSocket instance
     private url: string;                 // The WebSocket server URL
-    private messageHandler: ((data: any) => void) | null = null; // Callback for handling messages
+    private messageHandlers: Array<(data: any) => void> = []; // Array of message handlers
 
     /**
      * @constructor
@@ -41,15 +41,15 @@ class SocketService {
         // Event listener for incoming messages from the server
         this.ws.onmessage = (event: MessageEvent) => {
             console.log('Received message:', event.data);
-            // If a message handler is provided, call it with the received data
-            if (this.messageHandler) {
+            // Call all registered message handlers
+            if (this.messageHandlers.length > 0) {
                 try {
                     // Attempt to parse the data as JSON, assuming telemetry data is often JSON
                     const parsedData = JSON.parse(event.data);
-                    this.messageHandler(parsedData);
+                    this.messageHandlers.forEach(handler => handler(parsedData));
                 } catch (e) {
                     // If parsing fails, pass the raw string data
-                    this.messageHandler(event.data);
+                    this.messageHandlers.forEach(handler => handler(event.data));
                 }
             }
         };
@@ -82,11 +82,21 @@ class SocketService {
 
     /**
      * @method onMessage
-     * @description Sets a callback function to be executed when a message is received.
+     * @description Registers a callback function to be executed when a message is received.
+     * Multiple handlers can be registered.
      * @param {(data: any) => void} handler - The function to call with the received data.
      */
     public onMessage(handler: (data: any) => void): void {
-        this.messageHandler = handler;
+        this.messageHandlers.push(handler);
+    }
+
+    /**
+     * @method isConnected
+     * @description Checks if the WebSocket is currently connected.
+     * @returns {boolean} True if connected, false otherwise.
+     */
+    public isConnected(): boolean {
+        return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
     }
 }
 

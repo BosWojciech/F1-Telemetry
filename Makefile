@@ -117,10 +117,114 @@ prune: ## Remove unused Docker resources
 	@echo "$(GREEN)Prune complete!$(NC)"
 
 # Testing commands
-test: ## Run tests for all services
-	@echo "$(BLUE)Running tests...$(NC)"
-	docker-compose exec telemetry-processor pytest
-	@echo "$(GREEN)Tests complete!$(NC)"
+test: test-all ## Run all tests (alias for test-all)
+
+test-all: test-cpp test-processor test-simulator test-frontend ## Run all unit tests
+	@echo ""
+	@echo "$(GREEN)═══════════════════════════════════════════════════════$(NC)"
+	@echo "$(GREEN)✅ ALL UNIT TESTS COMPLETED$(NC)"
+	@echo "$(GREEN)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "Run 'make test-e2e' to test the full pipeline"
+
+test-cpp: ## Run C++ telemetry-ingest tests
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)🔧 Running C++ Tests (telemetry-ingest)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@cd services/telemetry-ingest && \
+		if [ ! -d "build" ]; then \
+			echo "Building C++ project..."; \
+			cmake --preset=default -DBUILD_TESTS=ON; \
+		fi && \
+		cmake --build build -j$$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) && \
+		cd build && \
+		ctest --output-on-failure --verbose
+	@echo ""
+	@echo "$(GREEN)✅ C++ tests passed!$(NC)"
+
+test-processor: ## Run Python telemetry-processor tests
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)🐍 Running Python Tests (telemetry-processor)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@cd services/telemetry-processor && \
+		pytest tests/ -v --cov=. --cov-report=term-missing --cov-fail-under=50
+	@echo ""
+	@echo "$(GREEN)✅ Processor tests passed!$(NC)"
+
+test-simulator: ## Run Python telemetry-simulator tests
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)🐍 Running Python Tests (telemetry-simulator)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@cd services/telemetry-simulator && \
+		pytest tests/ -v --cov=. --cov-report=term-missing --cov-fail-under=50
+	@echo ""
+	@echo "$(GREEN)✅ Simulator tests passed!$(NC)"
+
+test-frontend: ## Run React frontend tests
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)⚛️  Running Frontend Tests (React + TypeScript)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@cd services/telemetry-frontend && \
+		npm run test
+	@echo ""
+	@echo "$(GREEN)✅ Frontend tests passed!$(NC)"
+
+test-e2e: ## Run end-to-end integration tests
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)🔄 Running End-to-End Integration Tests$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "Checking if services are running..."
+	@if ! docker-compose ps | grep -q "Up"; then \
+		echo "⚠️  Services not running. Starting with docker-compose..."; \
+		docker-compose up -d; \
+		echo "Waiting 10 seconds for services to be ready..."; \
+		sleep 10; \
+	fi
+	@cd tests/e2e && \
+		pytest test_pipeline.py -v
+	@echo ""
+	@echo "$(GREEN)✅ E2E tests passed!$(NC)"
+
+test-coverage: ## Generate coverage reports for all services
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)📊 Generating Coverage Reports$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "➜ Python Processor Coverage..."
+	@cd services/telemetry-processor && pytest tests/ --cov=. --cov-report=html
+	@echo ""
+	@echo "➜ Python Simulator Coverage..."
+	@cd services/telemetry-simulator && pytest tests/ --cov=. --cov-report=html
+	@echo ""
+	@echo "➜ Frontend Coverage..."
+	@cd services/telemetry-frontend && npm run test:coverage
+	@echo ""
+	@echo "$(GREEN)✅ Coverage reports generated!$(NC)"
+	@echo ""
+	@echo "View reports:"
+	@echo "  Processor:  services/telemetry-processor/htmlcov/index.html"
+	@echo "  Simulator:  services/telemetry-simulator/htmlcov/index.html"
+	@echo "  Frontend:   services/telemetry-frontend/coverage/index.html"
+
+test-clean: ## Clean test artifacts and coverage reports
+	@echo "$(BLUE)🧹 Cleaning test artifacts...$(NC)"
+	@rm -rf services/telemetry-ingest/build/Testing
+	@rm -rf services/telemetry-processor/htmlcov services/telemetry-processor/.coverage services/telemetry-processor/.pytest_cache
+	@rm -rf services/telemetry-simulator/htmlcov services/telemetry-simulator/.coverage services/telemetry-simulator/.pytest_cache
+	@rm -rf services/telemetry-frontend/coverage
+	@rm -rf tests/e2e/htmlcov tests/e2e/.coverage tests/e2e/.pytest_cache
+	@echo "$(GREEN)✅ Test artifacts cleaned!$(NC)"
 
 # Initialization
 init: ## Initialize the project (copy .env.example to .env)

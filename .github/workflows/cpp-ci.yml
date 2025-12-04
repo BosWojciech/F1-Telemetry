@@ -30,24 +30,32 @@ jobs:
             build-essential \
             cmake \
             libzmq3-dev \
+            libgtest-dev \
+            lcov \
             valgrind
       
       - name: Configure CMake
         working-directory: services/telemetry-ingest
         run: |
-          cmake --preset=default -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+          cmake --preset=default -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DBUILD_TESTS=ON
       
       - name: Build
         working-directory: services/telemetry-ingest
         run: |
           cmake --build build --config ${{ matrix.build-type }} -j$(nproc)
       
+      - name: Run unit tests
+        working-directory: services/telemetry-ingest
+        run: |
+          cd build
+          ctest --output-on-failure --verbose
+      
       - name: Run memory check (Debug only)
         if: matrix.build-type == 'Debug'
         working-directory: services/telemetry-ingest
         run: |
           echo "Memory checks would run here with valgrind"
-          # valgrind --leak-check=full ./build/telemetry-ingest
+          # valgrind --leak-check=full ./build/tests/f1-telemetry-ingest_tests
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

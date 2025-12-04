@@ -41,9 +41,20 @@ jobs:
         working-directory: services/telemetry-frontend
         run: npx tsc --noEmit
       
+      - name: Run tests
+        working-directory: services/telemetry-frontend
+        run: npm run test:coverage
+      
       - name: Build
         working-directory: services/telemetry-frontend
         run: npm run build
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          files: services/telemetry-frontend/coverage/coverage-final.json
+          flags: telemetry-frontend
+          fail_ci_if_error: true
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

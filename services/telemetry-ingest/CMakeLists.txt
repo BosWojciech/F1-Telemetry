@@ -68,3 +68,57 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "ZeroMQ include: ${ZMQ_INCLUDE_DIR}")
 message(STATUS "ZeroMQ library: ${ZMQ_LIBRARY}")
+
+# ============================================
+# Testing Configuration
+# ============================================
+option(BUILD_TESTS "Build unit tests" ON)
+
+if(BUILD_TESTS)
+    enable_testing()
+    
+    # Find Google Test
+    find_package(GTest REQUIRED)
+    include(GoogleTest)
+    
+    # Source files for library (exclude main.cpp)
+    file(GLOB_RECURSE LIB_SOURCES
+        ${PROJECT_SOURCE_DIR}/src/core/*.cpp
+        ${PROJECT_SOURCE_DIR}/src/network/*.cpp
+    )
+    
+    # Create library from source files (needed for testing)
+    add_library(${PROJECT_NAME}_lib STATIC ${LIB_SOURCES})
+    target_link_libraries(${PROJECT_NAME}_lib
+        PUBLIC
+        Threads::Threads
+        ${ZMQ_LIBRARY}
+    )
+    target_include_directories(${PROJECT_NAME}_lib
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/include
+        ${ZMQ_INCLUDE_DIR}
+    )
+    
+    # Test files
+    file(GLOB TEST_SOURCES ${PROJECT_SOURCE_DIR}/tests/*.cpp)
+    
+    # Create test executable
+    add_executable(${PROJECT_NAME}_tests ${TEST_SOURCES})
+    target_link_libraries(${PROJECT_NAME}_tests
+        PRIVATE
+        ${PROJECT_NAME}_lib
+        GTest::gtest
+        GTest::gtest_main
+    )
+    
+    # Discover and register tests
+    gtest_discover_tests(${PROJECT_NAME}_tests)
+    
+    # Set output directory for tests
+    set_target_properties(${PROJECT_NAME}_tests PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+    )
+    
+    message(STATUS "Testing enabled - Google Test found")
+endif()

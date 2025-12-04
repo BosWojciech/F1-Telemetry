@@ -19,5 +19,11 @@ orjson>=3.9.0  # Fast JSON serialization
 # Future: For InfluxDB integration
 # influxdb-client>=1.38.0
 
+# Testing dependencies
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+
 # Future: For Graylog integration
 # graypy>=2.1.0

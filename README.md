@@ -1,9 +1,10 @@
 # F1 Telemetry System
 
 [![CI/CD Pipeline](https://github.com/BosWojciech/F1-Telemetry/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/BosWojciech/F1-Telemetry/actions)
+[![Test Coverage](https://img.shields.io/badge/coverage-%3E50%25-brightgreen.svg)](https://codecov.io)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> Professional, containerized microservices architecture for real-time F1 game telemetry processing and visualization.
+> Professional, production-ready microservices architecture for real-time F1 game telemetry processing, analysis, and visualization. Fully tested with 50%+ code coverage.
 
 ## 🏎️ Overview
 
@@ -155,22 +156,54 @@ Access monitoring tools:
 
 ## 🧪 Testing
 
+The project has comprehensive test coverage (50%+ minimum) across all services.
+
 ### Run All Tests
 
 ```bash
-# C++ service
-cd services/telemetry-ingest
-cmake --build build
-./build/tests/telemetry-ingest-tests
+# Run all tests at once
+make test-all
 
-# Python service
-cd services/telemetry-processor
-pytest --cov=.
-
-# Frontend
-cd services/telemetry-frontend
-npm test
+# Or run individual service tests
+make test-cpp         # C++ telemetry-ingest tests (Google Test)
+make test-processor   # Python processor tests (pytest)
+make test-simulator   # Python simulator tests (pytest)
+make test-frontend    # React frontend tests (Vitest)
+make test-e2e        # End-to-end integration tests
 ```
+
+### Test Coverage
+
+```bash
+# Generate coverage reports for all services
+make test-coverage
+
+# View reports
+open services/telemetry-processor/htmlcov/index.html
+open services/telemetry-simulator/htmlcov/index.html
+open services/telemetry-frontend/coverage/index.html
+```
+
+### Test Statistics
+
+| Service | Test Framework | Test Cases | Coverage |
+|---------|---------------|-----------|----------|
+| **telemetry-ingest** | Google Test | 9 | >50% |
+| **telemetry-processor** | pytest | 32 | >50% |
+| **telemetry-simulator** | pytest | 29 | >50% |
+| **telemetry-frontend** | Vitest | 21 | >50% |
+| **E2E Tests** | pytest | 7 | N/A |
+
+### CI/CD Testing
+
+All tests run automatically on push/PR:
+- ✅ Unit tests for all services
+- ✅ Coverage enforcement (50% minimum)
+- ✅ Multi-version testing (Python 3.10-3.12, Node 18-20)
+- ✅ E2E integration tests
+- ✅ Docker build verification
+
+See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed testing documentation.
 
 ## 🔒 Security
 

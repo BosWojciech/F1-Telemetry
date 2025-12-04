@@ -70,7 +70,7 @@ WORKDIR /app
 
 # Copy built binary from builder stage
 COPY --from=builder /app/build/telemetry-ingest /app/telemetry-ingest
-COPY --from=builder /app/build/*.so* /app/ 2>/dev/null || true
+COPY --from=builder /app/build/*.so* /app/
 
 # Create logs directory
 RUN mkdir -p /app/logs && chown -R telemetry:telemetry /app
