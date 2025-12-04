@@ -1,0 +1,52 @@
+name: Frontend CI
+
+on:
+  push:
+    paths:
+      - 'services/telemetry-frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    paths:
+      - 'services/telemetry-frontend/**'
+
+jobs:
+  lint-build-test:
+    name: Lint, Build and Test Frontend
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: services/telemetry-frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: services/telemetry-frontend
+        run: npm ci
+      
+      - name: Lint
+        working-directory: services/telemetry-frontend
+        run: npm run lint
+      
+      - name: Type check
+        working-directory: services/telemetry-frontend
+        run: npx tsc --noEmit
+      
+      - name: Build
+        working-directory: services/telemetry-frontend
+        run: npm run build
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-node-${{ matrix.node-version }}
+          path: services/telemetry-frontend/dist

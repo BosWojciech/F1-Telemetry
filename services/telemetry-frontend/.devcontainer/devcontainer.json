@@ -1,0 +1,50 @@
+{
+    "name": "F1 Telemetry Frontend (React)",
+    "dockerComposeFile": "../../docker-compose.yml",
+    "service": "telemetry-frontend",
+    "workspaceFolder": "/app",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "bradlc.vscode-tailwindcss",
+                "dsznajder.es7-react-js-snippets",
+                "christian-kohler.npm-intellisense",
+                "christian-kohler.path-intellisense",
+                "formulahendry.auto-rename-tag",
+                "mgmcdermott.vscode-language-babel"
+            ],
+            "settings": {
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.eslint": true
+                },
+                "typescript.tsdk": "node_modules/typescript/lib",
+                "typescript.enablePromptUseWorkspaceTsdk": true,
+                "eslint.validate": [
+                    "javascript",
+                    "javascriptreact",
+                    "typescript",
+                    "typescriptreact"
+                ]
+            }
+        }
+    },
+    
+    "forwardPorts": [5173, 3000],
+    "portsAttributes": {
+        "5173": {
+            "label": "Vite Dev Server"
+        },
+        "3000": {
+            "label": "Production Preview"
+        }
+    },
+    
+    "postCreateCommand": "npm install",
+    
+    "remoteUser": "telemetry"
+}

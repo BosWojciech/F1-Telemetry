@@ -1,0 +1,44 @@
+{
+    "name": "F1 Telemetry Ingest (C++)",
+    "dockerComposeFile": "../../docker-compose.yml",
+    "service": "telemetry-ingest",
+    "workspaceFolder": "/app",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cmake-tools",
+                "twxs.cmake",
+                "jeff-hykin.better-cpp-syntax",
+                "cschlosser.doxdocgen",
+                "vadimcn.vscode-lldb"
+            ],
+            "settings": {
+                "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+                "cmake.configureOnOpen": true,
+                "cmake.buildDirectory": "${workspaceFolder}/build",
+                "files.associations": {
+                    "*.h": "cpp",
+                    "*.hpp": "cpp"
+                }
+            }
+        }
+    },
+    
+    "forwardPorts": [20777, 5555],
+    "portsAttributes": {
+        "20777": {
+            "label": "F1 UDP Telemetry",
+            "protocol": "udp"
+        },
+        "5555": {
+            "label": "ZeroMQ Publisher"
+        }
+    },
+    
+    "postCreateCommand": "cmake --preset=debug && cmake --build build --config Debug",
+    
+    "remoteUser": "telemetry"
+}

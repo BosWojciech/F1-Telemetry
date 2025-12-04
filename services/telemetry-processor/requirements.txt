@@ -1,0 +1,23 @@
+# Production dependencies
+pyzmq>=25.1.0
+websockets>=12.0
+asyncio>=3.4.3
+
+# Logging and monitoring
+structlog>=23.1.0
+python-json-logger>=2.0.7
+
+# Configuration management
+python-dotenv>=1.0.0
+
+# Data handling
+orjson>=3.9.0  # Fast JSON serialization
+
+# Future: For Kafka migration
+# confluent-kafka>=2.3.0
+
+# Future: For InfluxDB integration
+# influxdb-client>=1.38.0
+
+# Future: For Graylog integration
+# graypy>=2.1.0

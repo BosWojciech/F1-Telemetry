@@ -1,0 +1,56 @@
+name: C++ Service CI
+
+on:
+  push:
+    paths:
+      - 'services/telemetry-ingest/**'
+      - '.github/workflows/cpp-ci.yml'
+  pull_request:
+    paths:
+      - 'services/telemetry-ingest/**'
+
+jobs:
+  build-and-test:
+    name: Build and Test C++ Service
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        build-type: [Debug, Release]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            libzmq3-dev \
+            valgrind
+      
+      - name: Configure CMake
+        working-directory: services/telemetry-ingest
+        run: |
+          cmake --preset=default -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+      
+      - name: Build
+        working-directory: services/telemetry-ingest
+        run: |
+          cmake --build build --config ${{ matrix.build-type }} -j$(nproc)
+      
+      - name: Run memory check (Debug only)
+        if: matrix.build-type == 'Debug'
+        working-directory: services/telemetry-ingest
+        run: |
+          echo "Memory checks would run here with valgrind"
+          # valgrind --leak-check=full ./build/telemetry-ingest
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: telemetry-ingest-${{ matrix.os }}-${{ matrix.build-type }}
+          path: services/telemetry-ingest/build/telemetry-ingest

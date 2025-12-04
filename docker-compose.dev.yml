@@ -1,0 +1,40 @@
+version: '3.9'
+
+# Development override for hot-reloading and debugging
+services:
+  telemetry-ingest:
+    build:
+      target: development
+    volumes:
+      - ./services/telemetry-ingest:/app
+      - /app/build  # Prevent overwriting build artifacts
+    environment:
+      - LOG_LEVEL=debug
+      - CMAKE_BUILD_TYPE=Debug
+
+  telemetry-processor:
+    build:
+      target: development
+    volumes:
+      - ./services/telemetry-processor:/app
+      - /app/.venv  # Preserve virtual environment
+    ports:
+      - "5678:5678"  # Python debugger port (debugpy)
+    environment:
+      - LOG_LEVEL=debug
+      - PYTHONDONTWRITEBYTECODE=1
+      - MODE=passthrough
+    command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client main.py --mode passthrough
+
+  telemetry-frontend:
+    build:
+      target: development
+    volumes:
+      - ./services/telemetry-frontend:/app
+      - /app/node_modules  # Prevent overwriting node_modules
+    ports:
+      - "5173:5173"  # Vite dev server port
+    environment:
+      - NODE_ENV=development
+      - VITE_WEBSOCKET_URL=ws://localhost:8765
+    command: npm run dev -- --host 0.0.0.0
