@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   # ZeroMQ Message Broker (for now, will migrate to Kafka later)
   zeromq-broker:
@@ -13,6 +11,32 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  # Service 0: Telemetry Simulator (Replaces F1 Game for testing)
+  telemetry-simulator:
+    build:
+      context: ./services/telemetry-simulator
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: f1-telemetry-simulator
+    restart: unless-stopped
+    environment:
+      - TARGET_HOST=telemetry-ingest
+      - TARGET_PORT=20777
+      - CONFIG_FILE=config/race_simulation.json
+    networks:
+      - f1-telemetry-network
+    volumes:
+      - ./services/telemetry-simulator/config:/app/config
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      telemetry-ingest:
+        condition: service_healthy
 
   # Service 1: Telemetry Ingest (C++ UDP Listener & Parser)
   telemetry-ingest:

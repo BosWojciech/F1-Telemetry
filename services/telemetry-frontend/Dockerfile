@@ -45,12 +45,10 @@ COPY --from=dependencies /app/node_modules ./node_modules
 # Copy source code
 COPY . .
 
-# Create non-root user
-RUN addgroup -g 1000 telemetry && \
-    adduser -D -u 1000 -G telemetry telemetry && \
-    chown -R telemetry:telemetry /app
+# Create non-root user (use node user that already exists in Alpine)
+RUN chown -R node:node /app
 
-USER telemetry
+USER node
 
 EXPOSE 5173
 
@@ -67,16 +65,14 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Create non-root user for Nginx
-RUN addgroup -g 1000 telemetry && \
-    adduser -D -u 1000 -G telemetry telemetry && \
-    chown -R telemetry:telemetry /usr/share/nginx/html && \
-    chown -R telemetry:telemetry /var/cache/nginx && \
-    chown -R telemetry:telemetry /var/log/nginx && \
+# Use nginx user (already exists) and set permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
     touch /var/run/nginx.pid && \
-    chown -R telemetry:telemetry /var/run/nginx.pid
+    chown -R nginx:nginx /var/run/nginx.pid
 
-USER telemetry
+USER nginx
 
 EXPOSE 80
 

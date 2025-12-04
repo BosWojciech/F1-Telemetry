@@ -8,43 +8,14 @@ Middleware service that:
 4. Optionally stores data for analysis (datacollection mode)
 """
 
-import asyncio
 import argparse
-import logging
 import signal
 import sys
-from typing import Optional
+import time
+import json
 
-from dotenv import load_dotenv
-import structlog
-
-from zmq_client.zmq_client import ZMQClient
-from websocket_server.websocket_server import WebSocketServer
-
-
-# Load environment variables
-load_dotenv()
-
-# Configure structured logging
-structlog.configure(
-    processors=[
-        structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.processors.JSONRenderer()
-    ],
-    wrapper_class=structlog.stdlib.BoundLogger,
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
-
-logger = structlog.get_logger()
+from zmq_client.zmq_client import ZmqClient
+from websocket_server.websocket_server import WebsocketServer
 
 
 class TelemetryProcessor:
@@ -52,95 +23,105 @@ class TelemetryProcessor:
     
     def __init__(self, mode: str):
         self.mode = mode
-        self.zmq_client: Optional[ZMQClient] = None
-        self.websocket_server: Optional[WebSocketServer] = None
+        self.zmq_client = None
+        self.websocket_server = None
         self.running = False
         
-        logger.info("telemetry_processor_initialized", mode=mode)
+        print(f"[INFO] Telemetry Processor initialized in {mode} mode")
     
-    async def start(self):
+    def start(self):
         """Start the telemetry processor service"""
         self.running = True
         
         try:
+            # Initialize and start WebSocket server (runs in separate thread)
+            print("[INFO] Starting WebSocket server...")
+            self.websocket_server = WebsocketServer(host="0.0.0.0", port=8765)
+            self.websocket_server.start()
+            time.sleep(1)  # Give server time to start
+            
             # Initialize ZMQ client
-            self.zmq_client = ZMQClient()
+            print("[INFO] Connecting to ZMQ publisher...")
+            zmq_address = "tcp://telemetry-ingest:5555"
+            self.zmq_client = ZmqClient(zmq_address, [''])
+            self.zmq_client.connect()
+            self.zmq_client.subscribe()
             
-            # Initialize WebSocket server
-            self.websocket_server = WebSocketServer()
+            print(f"[INFO] Telemetry Processor started successfully!")
+            print(f"[INFO] Mode: {self.mode}")
+            print(f"[INFO] Listening for telemetry data...")
             
-            # Start WebSocket server
-            websocket_task = asyncio.create_task(self.websocket_server.start())
+            # Main loop - continuously receive and process data
+            while self.running:
+                topic, payload = self.zmq_client.captureData()
+                
+                if topic and payload:
+                    self._handle_telemetry_data(topic, payload)
             
-            # Start ZMQ client with message handler
-            zmq_task = asyncio.create_task(
-                self.zmq_client.start(self._handle_telemetry_data)
-            )
-            
-            logger.info("telemetry_processor_started", mode=self.mode)
-            
-            # Wait for both tasks
-            await asyncio.gather(websocket_task, zmq_task)
-            
+        except KeyboardInterrupt:
+            print("\n[INFO] Received shutdown signal")
+            self.stop()
         except Exception as e:
-            logger.error("telemetry_processor_error", error=str(e), exc_info=True)
+            print(f"[ERROR] Telemetry processor error: {e}")
+            import traceback
+            traceback.print_exc()
+            self.stop()
             raise
     
-    async def _handle_telemetry_data(self, data: dict):
+    def _handle_telemetry_data(self, topic: str, payload: dict):
         """
         Process incoming telemetry data and forward to WebSocket clients
         
         Args:
-            data: Parsed telemetry data from ZMQ
+            topic: ZMQ topic
+            payload: Parsed telemetry data from ZMQ
         """
         try:
             if self.mode == "passthrough":
                 # Simply forward data to WebSocket clients
-                await self.websocket_server.broadcast(data)
+                data_str = json.dumps(payload)
+                self.websocket_server.send(data_str)
             
             elif self.mode == "datacollection":
                 # TODO: Implement data deduplication and storage
                 # For now, still forward to clients
-                await self.websocket_server.broadcast(data)
-                # await self._store_data(data)
+                data_str = json.dumps(payload)
+                self.websocket_server.send(data_str)
+                # self._store_data(payload)
             
         except Exception as e:
-            logger.error("data_processing_error", error=str(e), exc_info=True)
+            print(f"[ERROR] Data processing error: {e}")
     
-    async def stop(self):
+    def stop(self):
         """Gracefully stop the service"""
-        logger.info("telemetry_processor_stopping")
+        print("[INFO] Stopping Telemetry Processor...")
         self.running = False
         
         if self.zmq_client:
-            await self.zmq_client.stop()
+            self.zmq_client.stop = True
         
-        if self.websocket_server:
-            await self.websocket_server.stop()
-        
-        logger.info("telemetry_processor_stopped")
+        print("[INFO] Telemetry Processor stopped")
 
 
-async def main(mode: str):
+def main(mode: str):
     """Main entry point"""
     processor = TelemetryProcessor(mode=mode)
     
     # Setup signal handlers for graceful shutdown
-    loop = asyncio.get_running_loop()
+    def signal_handler(sig, frame):
+        print(f"\n[INFO] Shutdown signal received: {sig}")
+        processor.stop()
+        sys.exit(0)
     
-    def signal_handler():
-        logger.info("shutdown_signal_received")
-        asyncio.create_task(processor.stop())
-    
-    for sig in (signal.SIGTERM, signal.SIGINT):
-        loop.add_signal_handler(sig, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     
     try:
-        await processor.start()
-    except KeyboardInterrupt:
-        logger.info("keyboard_interrupt")
-    finally:
-        await processor.stop()
+        processor.start()
+    except Exception as e:
+        print(f"[ERROR] Fatal error: {e}")
+        processor.stop()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -151,23 +132,11 @@ if __name__ == "__main__":
         default="passthrough",
         help="Operation mode: passthrough or datacollection"
     )
-    parser.add_argument(
-        "--log-level",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-        default="INFO",
-        help="Logging level"
-    )
     
     args = parser.parse_args()
     
-    # Set logging level
-    logging.basicConfig(
-        level=getattr(logging, args.log_level),
-        format="%(message)s"
-    )
-    
     try:
-        asyncio.run(main(args.mode))
+        main(args.mode)
     except Exception as e:
-        logger.error("fatal_error", error=str(e), exc_info=True)
+        print(f"[ERROR] Fatal error: {e}")
         sys.exit(1)

@@ -60,6 +60,9 @@ logs-processor: ## View logs from telemetry-processor service
 logs-frontend: ## View logs from telemetry-frontend service
 	docker-compose logs -f telemetry-frontend
 
+logs-simulator: ## View logs from telemetry-simulator service
+	docker-compose logs -f telemetry-simulator
+
 # Utility commands
 ps: ## List running services
 	docker-compose ps
@@ -81,6 +84,9 @@ restart-processor: ## Restart telemetry-processor service
 restart-frontend: ## Restart telemetry-frontend service
 	docker-compose restart telemetry-frontend
 
+restart-simulator: ## Restart telemetry-simulator service
+	docker-compose restart telemetry-simulator
+
 # Shell access
 shell-ingest: ## Open shell in telemetry-ingest container
 	docker-compose exec telemetry-ingest /bin/bash
@@ -90,6 +96,9 @@ shell-processor: ## Open shell in telemetry-processor container
 
 shell-frontend: ## Open shell in telemetry-frontend container
 	docker-compose exec telemetry-frontend /bin/sh
+
+shell-simulator: ## Open shell in telemetry-simulator container
+	docker-compose exec telemetry-simulator /bin/bash
 
 # Cleanup commands
 clean: ## Remove all containers, volumes, and images

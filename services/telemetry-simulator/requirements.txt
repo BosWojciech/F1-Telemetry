@@ -1,0 +1,5 @@
+# Python dependencies for telemetry simulator
+# Minimal requirements - uses standard library mostly
+
+# For future enhancements
+structlog>=23.1.0  # Structured logging (optional)
