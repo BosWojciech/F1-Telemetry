@@ -83,7 +83,7 @@ jobs:
           echo "✅ Tests passed for ${{ matrix.service }}"
       
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: services/${{ matrix.service }}/coverage.xml
           flags: ${{ matrix.service }}
@@ -117,7 +117,7 @@ jobs:
         run: npm run build
       
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: services/telemetry-frontend/coverage/coverage-final.json
           flags: telemetry-frontend
