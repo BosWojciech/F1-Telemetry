@@ -1,6 +1,6 @@
 # F1 Telemetry System
 
-[![CI/CD Pipeline](https://github.com/BosWojciech/F1-Telemetry/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/BosWojciech/F1-Telemetry/actions)
+[![CI](https://github.com/BosWojciech/F1-Telemetry/workflows/CI/badge.svg)](https://github.com/BosWojciech/F1-Telemetry/actions)
 [![Test Coverage](https://img.shields.io/badge/coverage-%3E50%25-brightgreen.svg)](https://codecov.io)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 

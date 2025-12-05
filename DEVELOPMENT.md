@@ -181,6 +181,26 @@ cd build && ctest --verbose
 
 #### Python Services (Processor & Simulator)
 
+**Using Poetry (Recommended):**
+
+```bash
+cd services/telemetry-processor
+
+# Install Poetry if not installed
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Install dependencies
+poetry install
+
+# Run tests with coverage
+poetry run pytest
+
+# Run service
+poetry run python main.py --mode passthrough
+```
+
+**Using pip (Legacy):**
+
 ```bash
 cd services/telemetry-processor
 
