@@ -1,0 +1,56 @@
+# Development override for hot-reloading and debugging
+services:
+  telemetry-simulator:
+    build:
+      target: development
+    volumes:
+      - ./services/telemetry-simulator:/app
+      - /app/.venv  # Preserve virtual environment
+    ports:
+      - "5679:5679"  # Python debugger port
+    environment:
+      - LOG_LEVEL=debug
+    command: python simulator.py --config config/test_simulation.json
+
+  telemetry-ingest:
+    build:
+      target: development
+    volumes:
+      - ./services/telemetry-ingest:/app
+      - /app/build  # Prevent overwriting build artifacts
+    environment:
+      - LOG_LEVEL=debug
+      - CMAKE_BUILD_TYPE=Debug
+
+  telemetry-processor:
+    build:
+      target: development
+    volumes:
+      - ./services/telemetry-processor:/app
+      - /app/.venv  # Preserve virtual environment
+    ports:
+      - "5678:5678"  # Python debugger port (debugpy)
+    environment:
+      - LOG_LEVEL=debug
+      - PYTHONDONTWRITEBYTECODE=1
+      - MODE=passthrough
+    command: python main.py --mode passthrough
+
+  telemetry-frontend:
+    build:
+      target: development
+    volumes:
+      - ./services/telemetry-frontend:/app
+      - /app/node_modules  # Prevent overwriting node_modules
+    ports:
+      - "5173:5173"  # Vite dev server port
+    environment:
+      - NODE_ENV=development
+      - VITE_WEBSOCKET_URL=ws://localhost:8765
+    command: npm run dev -- --host 0.0.0.0
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s

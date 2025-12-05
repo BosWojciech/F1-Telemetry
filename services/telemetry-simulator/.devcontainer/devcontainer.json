@@ -1,0 +1,48 @@
+{
+    "name": "F1 Telemetry Simulator (Python)",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": "..",
+        "target": "development"
+    },
+    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-simulator",
+    "runArgs": ["--network=host"],
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-python.flake8",
+                "ms-python.debugpy",
+                "charliermarsh.ruff"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.flake8Enabled": true,
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": "explicit"
+                }
+            }
+        }
+    },
+    
+    "forwardPorts": [5679],
+    "portsAttributes": {
+        "5679": {
+            "label": "Python Debugger"
+        }
+    },
+    
+    "postCreateCommand": "pip install -r requirements.txt && pip install debugpy pytest pytest-cov black flake8 mypy",
+    
+    "remoteUser": "root"
+}

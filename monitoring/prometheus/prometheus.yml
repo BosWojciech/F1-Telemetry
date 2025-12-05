@@ -1,0 +1,50 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'f1-telemetry'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # cAdvisor - Container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # Node Exporter - System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Telemetry services (when instrumented with Prometheus exporters)
+  - job_name: 'telemetry-ingest'
+    static_configs:
+      - targets: ['telemetry-ingest:9091']
+    metrics_path: '/metrics'
+
+  - job_name: 'telemetry-processor'
+    static_configs:
+      - targets: ['telemetry-processor:9092']
+    metrics_path: '/metrics'
+
+  - job_name: 'telemetry-frontend'
+    static_configs:
+      - targets: ['telemetry-frontend:9093']
+    metrics_path: '/metrics'

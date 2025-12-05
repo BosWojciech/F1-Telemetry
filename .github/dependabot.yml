@@ -1,0 +1,63 @@
+version: 2
+
+updates:
+  # Docker base images
+  - package-ecosystem: "docker"
+    directory: "/services/telemetry-ingest"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+    reviewers:
+      - "BosWojciech"
+
+  - package-ecosystem: "docker"
+    directory: "/services/telemetry-processor"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/services/telemetry-frontend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/services/telemetry-processor"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "python"
+    reviewers:
+      - "BosWojciech"
+
+  # NPM dependencies
+  - package-ecosystem: "npm"
+    directory: "/services/telemetry-frontend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "javascript"
+    reviewers:
+      - "BosWojciech"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ci"

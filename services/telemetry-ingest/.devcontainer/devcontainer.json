@@ -1,0 +1,52 @@
+{
+    "name": "F1 Telemetry Ingest (C++)",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": "..",
+        "target": "development"
+    },
+    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-ingest",
+    "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined", "--network=host"],
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cmake-tools",
+                "twxs.cmake",
+                "jeff-hykin.better-cpp-syntax",
+                "cschlosser.doxdocgen",
+                "vadimcn.vscode-lldb"
+            ],
+            "settings": {
+                "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+                "cmake.configureOnOpen": false,
+                "cmake.buildDirectory": "${workspaceFolder}/build",
+                "files.associations": {
+                    "*.h": "cpp",
+                    "*.hpp": "cpp"
+                }
+            }
+        }
+    },
+    
+    "forwardPorts": [20777, 5555],
+    "portsAttributes": {
+        "20777": {
+            "label": "F1 UDP Telemetry",
+            "protocol": "udp"
+        },
+        "5555": {
+            "label": "ZeroMQ Publisher"
+        }
+    },
+    
+    "postCreateCommand": "cmake --preset=default -DBUILD_TESTS=ON && cmake --build build",
+    
+    "remoteUser": "root"
+}

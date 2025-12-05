@@ -1,0 +1,63 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+LICENSE
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Build artifacts
+build/
+dist/
+*.o
+*.so
+*.a
+*.out
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies (will be installed in container)
+node_modules/
+env/
+.venv/
+venv/
+
+# Test files
+test/
+tests/
+**/__tests__/
+**/*.test.*
+**/*.spec.*
+
+# Cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+.eslintcache

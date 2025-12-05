@@ -1,0 +1,70 @@
+[tool.poetry]
+name = "telemetry-processor"
+version = "1.0.0"
+description = "F1 Telemetry Processor - ZMQ to WebSocket bridge"
+authors = ["Wojciech Bos"]
+readme = "README.md"
+packages = [{include = "websocket_server"}, {include = "zmq_client"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pyzmq = "^25.1.0"
+websockets = "^12.0"
+structlog = "^23.1.0"
+python-json-logger = "^2.0.7"
+python-dotenv = "^1.0.0"
+orjson = "^3.9.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.11.0"
+black = "^23.12.0"
+flake8 = "^6.1.0"
+mypy = "^1.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--cov=.",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=50"
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "tests/*",
+    "venv/*",
+    "*/__pycache__/*",
+    "*/site-packages/*"
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false

@@ -1,0 +1,44 @@
+{
+    "description": "Race simulation configuration - simulates a typical F1 race",
+    "mode": "race",
+    "target_host": "telemetry-ingest",
+    "target_port": 20777,
+    "packet_format": 2023,
+    
+    "packet_types": {
+        "Motion": {
+            "enabled": true,
+            "frequency_hz": 60,
+            "description": "Car motion data"
+        },
+        "SessionData": {
+            "enabled": true,
+            "frequency_hz": 2,
+            "description": "Session information",
+            "weather": 0,
+            "track_temperature": 32,
+            "air_temperature": 24
+        },
+        "LapData": {
+            "enabled": true,
+            "frequency_hz": 10,
+            "description": "Lap timing data"
+        },
+        "CarTelemetry": {
+            "enabled": true,
+            "frequency_hz": 20,
+            "description": "Car telemetry (speed, throttle, etc)"
+        },
+        "CarStatus": {
+            "enabled": true,
+            "frequency_hz": 5,
+            "description": "Car status (fuel, tyres, etc)"
+        },
+        "Participants": {
+            "enabled": true,
+            "frequency_hz": 1,
+            "description": "Driver information",
+            "num_cars": 20
+        }
+    }
+}
