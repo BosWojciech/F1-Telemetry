@@ -3,7 +3,7 @@
 # ============================================
 # Stage 1: Build Stage
 # ============================================
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:24.04 AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -28,7 +28,7 @@ RUN cmake --preset=default \
 # ============================================
 # Stage 2: Development Stage
 # ============================================
-FROM ubuntu:22.04 AS development
+FROM ubuntu:24.04 AS development
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -55,7 +55,7 @@ CMD ["bash"]
 # ============================================
 # Stage 3: Runtime Stage (Production)
 # ============================================
-FROM ubuntu:22.04 AS runtime
+FROM ubuntu:24.04 AS runtime
 
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y \
