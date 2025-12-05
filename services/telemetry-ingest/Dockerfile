@@ -34,24 +34,23 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     gdb \
+    git \
     libzmq3-dev \
     pkg-config \
     valgrind \
+    libgtest-dev \
+    googletest \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy everything for development
-COPY . .
-
-# Build in debug mode
-RUN cmake --preset=default -DCMAKE_BUILD_TYPE=Debug \
-    && cmake --build build --config Debug
+# Don't build during image creation - let postCreateCommand handle it
+# This allows the devcontainer to build with the mounted source code
 
 EXPOSE 20777/udp
 EXPOSE 5555
 
-CMD ["./build/telemetry-ingest"]
+CMD ["bash"]
 
 # ============================================
 # Stage 3: Runtime Stage (Production)

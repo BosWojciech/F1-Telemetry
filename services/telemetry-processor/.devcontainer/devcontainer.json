@@ -5,8 +5,12 @@
         "context": "..",
         "target": "development"
     },
-    "workspaceFolder": "/app",
+    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-processor",
     "runArgs": ["--network=host"],
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
     
     "customizations": {
         "vscode": {
@@ -47,9 +51,5 @@
     
     "postCreateCommand": "pip install -r requirements.txt && pip install debugpy pytest pytest-asyncio pytest-cov black flake8 mypy",
     
-    "remoteUser": "root",
-    
-    "mounts": [
-        "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached"
-    ]
+    "remoteUser": "root"
 }

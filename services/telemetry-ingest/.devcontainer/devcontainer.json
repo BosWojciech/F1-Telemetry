@@ -5,8 +5,12 @@
         "context": "..",
         "target": "development"
     },
-    "workspaceFolder": "/app",
-    "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-ingest",
+    "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined", "--network=host"],
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
     
     "customizations": {
         "vscode": {
@@ -21,7 +25,7 @@
             ],
             "settings": {
                 "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-                "cmake.configureOnOpen": true,
+                "cmake.configureOnOpen": false,
                 "cmake.buildDirectory": "${workspaceFolder}/build",
                 "files.associations": {
                     "*.h": "cpp",
@@ -44,9 +48,5 @@
     
     "postCreateCommand": "cmake --preset=default -DBUILD_TESTS=ON && cmake --build build",
     
-    "remoteUser": "root",
-    
-    "mounts": [
-        "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached"
-    ]
+    "remoteUser": "root"
 }

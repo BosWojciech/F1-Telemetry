@@ -5,8 +5,12 @@
         "context": "..",
         "target": "development"
     },
-    "workspaceFolder": "/app",
+    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-frontend",
     "runArgs": ["--network=host"],
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
     
     "customizations": {
         "vscode": {
@@ -51,7 +55,6 @@
     "remoteUser": "root",
     
     "mounts": [
-        "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
-        "source=${localWorkspaceFolder}/node_modules,target=/app/node_modules,type=volume"
+        "source=telemetry-frontend-node-modules,target=/workspaces/F1-Telemetry/services/telemetry-frontend/node_modules,type=volume"
     ]
 }
