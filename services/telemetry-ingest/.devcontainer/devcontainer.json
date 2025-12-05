@@ -1,8 +1,12 @@
 {
     "name": "F1 Telemetry Ingest (C++)",
-    "dockerComposeFile": "../../docker-compose.yml",
-    "service": "telemetry-ingest",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": "..",
+        "target": "development"
+    },
     "workspaceFolder": "/app",
+    "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
     
     "customizations": {
         "vscode": {
@@ -38,7 +42,11 @@
         }
     },
     
-    "postCreateCommand": "cmake --preset=debug && cmake --build build --config Debug",
+    "postCreateCommand": "cmake --preset=default -DBUILD_TESTS=ON && cmake --build build",
     
-    "remoteUser": "telemetry"
+    "remoteUser": "root",
+    
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached"
+    ]
 }

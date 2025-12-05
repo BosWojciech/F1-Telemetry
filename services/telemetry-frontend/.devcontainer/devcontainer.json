@@ -1,8 +1,12 @@
 {
-    "name": "F1 Telemetry Frontend (React)",
-    "dockerComposeFile": "../../docker-compose.yml",
-    "service": "telemetry-frontend",
+    "name": "F1 Telemetry Frontend (React + TypeScript)",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": "..",
+        "target": "development"
+    },
     "workspaceFolder": "/app",
+    "runArgs": ["--network=host"],
     
     "customizations": {
         "vscode": {
@@ -44,5 +48,10 @@
     
     "postCreateCommand": "npm install",
     
-    "remoteUser": "telemetry"
+    "remoteUser": "root",
+    
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/node_modules,target=/app/node_modules,type=volume"
+    ]
 }

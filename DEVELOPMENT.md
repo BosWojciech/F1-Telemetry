@@ -30,7 +30,7 @@ Complete guide for setting up, developing, and deploying the F1 Telemetry micros
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/F1-Telemetry.git
+git clone https://github.com/BosWojciech/F1-Telemetry.git
 cd F1-Telemetry
 
 # Start all services
@@ -113,21 +113,34 @@ docker-compose logs -f telemetry-simulator
 
 ### Option 1: Dev Containers (Recommended)
 
-Each service has a `.devcontainer` configuration for VS Code.
+Each service has a standalone `.devcontainer` configuration for independent development.
 
+**Multi-Service Workflow:**
 ```bash
-# Open service in VS Code
-code services/telemetry-ingest
+# Open multiple services simultaneously in separate VS Code windows
+code services/telemetry-simulator    # Window 1: Simulator
+code services/telemetry-ingest       # Window 2: Ingest
+code services/telemetry-processor    # Window 3: Processor
+code services/telemetry-frontend     # Window 4: Frontend
 
-# VS Code will prompt to "Reopen in Container"
+# Each window will prompt: "Reopen in Container"
 # Or use Command Palette: "Dev Containers: Reopen in Container"
 ```
 
+**Single Service Development:**
+```bash
+# Work on just one service
+code services/telemetry-processor
+# Reopen in container when prompted
+```
+
 **Benefits:**
-- Pre-configured environment
-- All dependencies installed
-- Consistent across team members
-- Isolated from host system
+- ✅ Each service runs in its own isolated container
+- ✅ Work on multiple services simultaneously (e.g., simulator + ingest)
+- ✅ All dependencies pre-installed per service
+- ✅ Services communicate via `--network=host` 
+- ✅ No context switching between extensions
+- ✅ Consistent environment across team members
 
 ### Option 2: Devpod (Remote Development)
 
@@ -138,7 +151,7 @@ code services/telemetry-ingest
 brew install devpod
 
 # Create workspace from repository
-devpod up https://github.com/yourusername/F1-Telemetry
+devpod up https://github.com/BosWojciech/F1-Telemetry
 
 # Select service to develop
 devpod ssh F1-Telemetry

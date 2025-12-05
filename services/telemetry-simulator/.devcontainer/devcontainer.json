@@ -1,8 +1,12 @@
 {
     "name": "F1 Telemetry Simulator (Python)",
-    "dockerComposeFile": "../../docker-compose.yml",
-    "service": "telemetry-simulator",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": "..",
+        "target": "development"
+    },
     "workspaceFolder": "/app",
+    "runArgs": ["--network=host"],
     
     "customizations": {
         "vscode": {
@@ -15,7 +19,7 @@
                 "charliermarsh.ruff"
             ],
             "settings": {
-                "python.defaultInterpreterPath": "/app/.venv/bin/python",
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
                 "python.linting.enabled": true,
                 "python.linting.flake8Enabled": true,
                 "python.formatting.provider": "black",
@@ -34,7 +38,11 @@
         }
     },
     
-    "postCreateCommand": "pip install -r requirements.txt && pip install debugpy black flake8 mypy",
+    "postCreateCommand": "pip install -r requirements.txt && pip install debugpy pytest pytest-cov black flake8 mypy",
     
-    "remoteUser": "telemetry"
+    "remoteUser": "root",
+    
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached"
+    ]
 }
