@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package f1_23;
 
-import "enums.proto";
-
 // Packet size constants for F1 2023 telemetry data
 enum PacketSize {
   PACKET_SIZE_UNSPECIFIED = 0;
