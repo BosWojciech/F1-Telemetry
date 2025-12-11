@@ -1,0 +1,3 @@
+# Ignore protobuf generated files from type checking
+proto/*_pb2.py
+proto/*_pb2.pyi

@@ -98,7 +98,36 @@ shell-frontend: ## Open shell in telemetry-frontend container
 	docker-compose exec telemetry-frontend /bin/sh
 
 shell-simulator: ## Open shell in telemetry-simulator container
-	docker-compose exec telemetry-simulator /bin/bash
+	docker-compose exec telemetry-simulator /bin/sh
+
+# Protobuf
+F1_GAME_VERSION ?= 23
+PROTO_SRC_DIR := proto/f1_$(F1_GAME_VERSION)
+SIMULATOR_PROTO_DIR := services/telemetry-simulator/proto
+
+.PHONY: setup-proto proto
+
+setup-proto: ## Check if protoc is installed
+	@echo "$(BLUE)Checking for protoc installation...$(NC)"
+	@which protoc > /dev/null 2>&1 || \
+		(echo "$(RED)Error: protoc is not installed!$(NC)" && \
+		 echo "$(BLUE)Please install Protocol Buffers compiler:$(NC)" && \
+		 echo "  Visit: https://grpc.io/docs/protoc-installation/" && \
+		 echo "" && \
+		 echo "$(BLUE)Quick install options:$(NC)" && \
+		 echo "  macOS:   brew install protobuf" && \
+		 echo "  Linux:   apt install -y protobuf-compiler" && \
+		 echo "  Windows: Download from https://github.com/protocolbuffers/protobuf/releases" && \
+		 exit 1)
+	@echo "$(GREEN)protoc found: $$(protoc --version)$(NC)"
+
+proto: setup-proto ## Generate protobuf files
+	@echo "$(BLUE)Generating protobuf files for F1 $(F1_GAME_VERSION)...$(NC)"
+	@mkdir -p $(SIMULATOR_PROTO_DIR)
+	@touch $(SIMULATOR_PROTO_DIR)/__init__.py
+	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) --pyi_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto
+	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) --pyi_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/packet_definitions.proto
+	@echo "$(GREEN)Protobuf files generated in $(SIMULATOR_PROTO_DIR)$(NC)"
 
 # Cleanup commands
 clean: ## Remove all containers, volumes, and images

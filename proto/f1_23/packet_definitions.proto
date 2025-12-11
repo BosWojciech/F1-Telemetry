@@ -1,0 +1,570 @@
+syntax = "proto3";
+
+package f1_23;
+
+import "enums.proto";
+
+// Packet size constants for F1 2023 telemetry data
+enum PacketSize {
+  PACKET_SIZE_UNSPECIFIED = 0;
+  PACKET_MOTION_DATA_SIZE = 1349;
+  PACKET_SESSION_DATA_SIZE = 644;
+  PACKET_LAP_DATA_SIZE = 1131;
+  PACKET_EVENT_DATA_SIZE = 45;
+  PACKET_PARTICIPANTS_DATA_SIZE = 1306;
+  PACKET_CAR_SETUP_DATA_SIZE = 1107;
+  PACKET_CAR_TELEMETRY_DATA_SIZE = 1352;
+  PACKET_CAR_STATUS_DATA_SIZE = 1239;
+  PACKET_FINAL_CLASSIFICATION_DATA_SIZE = 1020;
+  PACKET_LOBBY_INFO_DATA_SIZE = 1218;
+  PACKET_CAR_DAMAGE_DATA_SIZE = 953;
+  PACKET_SESSION_HISTORY_DATA_SIZE = 1460;
+  PACKET_TYRE_SETS_DATA_SIZE = 231;
+  PACKET_MOTION_EX_DATA_SIZE = 217;
+}
+
+// Packet header included in all UDP packets
+message PacketHeader {
+  uint32 packet_format = 1;
+  uint32 game_year = 2;
+  uint32 game_major_version = 3;
+  uint32 game_minor_version = 4;
+  uint32 packet_version = 5;
+  uint32 packet_id = 6;
+  uint64 session_uid = 7;
+  float session_time = 8;
+  uint32 frame_identifier = 9;
+  uint32 overall_frame_identifier = 10;
+  uint32 player_car_index = 11;
+  uint32 secondary_player_car_index = 12;
+}
+
+// Motion data for a single car
+message CarMotionData {
+  float world_position_x = 1;      // World space X position - meters
+  float world_position_y = 2;      // World space Y position
+  float world_position_z = 3;      // World space Z position
+  float world_velocity_x = 4;      // Velocity in world space X - meters/s
+  float world_velocity_y = 5;      // Velocity in world space Y
+  float world_velocity_z = 6;      // Velocity in world space Z
+  int32 world_forward_dir_x = 7;   // World space forward X direction (normalized)
+  int32 world_forward_dir_y = 8;   // World space forward Y direction (normalized)
+  int32 world_forward_dir_z = 9;   // World space forward Z direction (normalized)
+  int32 world_right_dir_x = 10;    // World space right X direction (normalized)
+  int32 world_right_dir_y = 11;    // World space right Y direction (normalized)
+  int32 world_right_dir_z = 12;    // World space right Z direction (normalized)
+  float g_force_lateral = 13;      // Lateral G-Force component
+  float g_force_longitudinal = 14; // Longitudinal G-Force component
+  float g_force_vertical = 15;     // Vertical G-Force component
+  float yaw = 16;                  // Yaw angle in radians
+  float pitch = 17;                // Pitch angle in radians
+  float roll = 18;                 // Roll angle in radians
+}
+
+// Motion packet - data for all cars on track
+message PacketMotionData {
+  PacketHeader header = 1;                  // Header
+  repeated CarMotionData car_motion_data = 2; // Data for all cars on track
+}
+
+// Marshal zone data
+message MarshalZone {
+  float zone_start = 1; // Fraction (0..1) of way through the lap the marshal zone starts
+  int32 zone_flag = 2;  // -1 = invalid/unknown, 0 = none, 1 = green, 2 = blue, 3 = yellow
+}
+
+// Weather forecast sample
+message WeatherForecastSample {
+  uint32 session_type = 1;             // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P,
+                                       // 5 = Q1, 6 = Q2, 7 = Q3, 8 = Short Q, 9 = OSQ,
+                                       // 10 = R, 11 = R2, 12 = R3, 13 = Time Trial
+  uint32 time_offset = 2;              // Time in minutes the forecast is for
+  uint32 weather = 3;                  // Weather - 0 = clear, 1 = light cloud, 2 = overcast,
+                                       // 3 = light rain, 4 = heavy rain, 5 = storm
+  int32 track_temperature = 4;         // Track temp. in degrees Celsius
+  int32 track_temperature_change = 5;  // Track temp. change – 0 = up, 1 = down, 2 = no change
+  int32 air_temperature = 6;           // Air temp. in degrees Celsius
+  int32 air_temperature_change = 7;    // Air temp. change – 0 = up, 1 = down, 2 = no change
+  uint32 rain_percentage = 8;          // Rain percentage (0–100)
+}
+
+// Session data packet
+message PacketSessionData {
+  PacketHeader header = 1;                                   // Header
+  uint32 weather = 2;                                        // Weather - 0 = clear, 1 = light cloud, 2 = overcast,
+                                                             // 3 = light rain, 4 = heavy rain, 5 = storm
+  int32 track_temperature = 3;                               // Track temp. in degrees Celsius
+  int32 air_temperature = 4;                                 // Air temp. in degrees Celsius
+  uint32 total_laps = 5;                                     // Total number of laps in this race
+  uint32 track_length = 6;                                   // Track length in metres
+  uint32 session_type = 7;                                   // 0 = unknown, 1 = P1, 2 = P2, 3 = P3, 4 = Short P,
+                                                             // 5 = Q1, 6 = Q2, 7 = Q3, 8 = Short Q, 9 = OSQ,
+                                                             // 10 = R, 11 = R2, 12 = R3, 13 = Time Trial
+  int32 track_id = 8;                                        // -1 for unknown, see appendix
+  uint32 formula = 9;                                        // Formula, 0 = F1 Modern, 1 = F1 Classic, 2 = F2,
+                                                             // 3 = F1 Generic, 4 = Beta, 5 = Supercars,
+                                                             // 6 = Esports, 7 = F2 2021
+  uint32 session_time_left = 10;                             // Time left in session in seconds
+  uint32 session_duration = 11;                              // Session duration in seconds
+  uint32 pit_speed_limit = 12;                               // Pit speed limit in kilometres per hour
+  uint32 game_paused = 13;                                   // Whether the game is paused – network game only
+  uint32 is_spectating = 14;                                 // Whether the player is spectating
+  uint32 spectator_car_index = 15;                           // Index of the car being spectated
+  uint32 sli_pro_native_support = 16;                        // SLI Pro support, 0 = inactive, 1 = active
+  uint32 num_marshal_zones = 17;                             // Number of marshal zones to follow
+  repeated MarshalZone marshal_zones = 18;                   // List of marshal zones – max 21
+  uint32 safety_car_status = 19;                             // 0 = no safety car, 1 = full,
+                                                             // 2 = virtual, 3 = formation lap
+  uint32 network_game = 20;                                  // 0 = offline, 1 = online
+  uint32 num_weather_forecast_samples = 21;                  // Number of weather samples to follow
+  repeated WeatherForecastSample weather_forecast_samples = 22; // Array of weather forecast samples
+  uint32 forecast_accuracy = 23;                             // 0 = Perfect, 1 = Approximate
+  uint32 ai_difficulty = 24;                                 // AI Difficulty rating – 0-110
+  uint32 season_link_identifier = 25;                        // Identifier for season - persists across saves
+  uint32 weekend_link_identifier = 26;                       // Identifier for weekend - persists across saves
+  uint32 session_link_identifier = 27;                       // Identifier for session - persists across saves
+  uint32 pit_stop_window_ideal_lap = 28;                     // Ideal lap to pit on for current strategy (player)
+  uint32 pit_stop_window_latest_lap = 29;                    // Latest lap to pit on for current strategy (player)
+  uint32 pit_stop_rejoin_position = 30;                      // Predicted position to rejoin at (player)
+  uint32 steering_assist = 31;                               // 0 = off, 1 = on
+  uint32 braking_assist = 32;                                // 0 = off, 1 = low, 2 = medium, 3 = high
+  uint32 gearbox_assist = 33;                                // 1 = manual, 2 = manual & suggested gear, 3 = auto
+  uint32 pit_assist = 34;                                    // 0 = off, 1 = on
+  uint32 pit_release_assist = 35;                            // 0 = off, 1 = on
+  uint32 ers_assist = 36;                                    // 0 = off, 1 = on
+  uint32 drs_assist = 37;                                    // 0 = off, 1 = on
+  uint32 dynamic_racing_line = 38;                           // 0 = off, 1 = corners only, 2 = full
+  uint32 dynamic_racing_line_type = 39;                      // 0 = 2D, 1 = 3D
+  uint32 game_mode = 40;                                     // Game mode id - see appendix
+  uint32 rule_set = 41;                                      // Ruleset - see appendix
+  uint32 time_of_day = 42;                                   // Local time of day - minutes since midnight
+  uint32 session_length = 43;                                // 0 = None, 2 = Very Short, 3 = Short, 4 = Medium,
+                                                             // 5 = Medium Long, 6 = Long, 7 = Full
+  uint32 speed_units_lead_player = 44;                       // 0 = MPH, 1 = KPH
+  uint32 temperature_units_lead_player = 45;                 // 0 = Celsius, 1 = Fahrenheit
+  uint32 speed_units_secondary_player = 46;                  // 0 = MPH, 1 = KPH
+  uint32 temperature_units_secondary_player = 47;            // 0 = Celsius, 1 = Fahrenheit
+  uint32 num_safety_car_periods = 48;                        // Number of safety cars called during session
+  uint32 num_virtual_safety_car_periods = 49;                // Number of virtual safety cars called
+  uint32 num_red_flag_periods = 50;                          // Number of red flags called during session
+}
+
+// Lap data for a single car
+message LapData {
+  uint32 last_lap_time_in_ms = 1;              // Last lap time in milliseconds
+  uint32 current_lap_time_in_ms = 2;           // Current time around the lap in milliseconds
+  uint32 sector1_time_in_ms = 3;               // Sector 1 time in milliseconds
+  uint32 sector1_time_minutes = 4;             // Sector 1 whole minute part
+  uint32 sector2_time_in_ms = 5;               // Sector 2 time in milliseconds
+  uint32 sector2_time_minutes = 6;             // Sector 2 whole minute part
+  uint32 delta_to_car_in_front_in_ms = 7;     // Time delta to car in front in milliseconds
+  uint32 delta_to_race_leader_in_ms = 8;      // Time delta to race leader in milliseconds
+  float lap_distance = 9;                      // Distance vehicle is around current lap in metres – could be negative if line hasn't been crossed yet
+  float total_distance = 10;                   // Total distance travelled in session in metres – could be negative if line hasn't been crossed yet
+  float safety_car_delta = 11;                 // Delta in seconds for safety car
+  uint32 car_position = 12;                    // Car race position
+  uint32 current_lap_num = 13;                 // Current lap number
+  uint32 pit_status = 14;                      // 0 = none, 1 = pitting, 2 = in pit area
+  uint32 num_pit_stops = 15;                   // Number of pit stops taken in this race
+  uint32 sector = 16;                          // 0 = sector1, 1 = sector2, 2 = sector3
+  uint32 current_lap_invalid = 17;             // Current lap invalid - 0 = valid, 1 = invalid
+  uint32 penalties = 18;                       // Accumulated time penalties in seconds to be added
+  uint32 total_warnings = 19;                  // Accumulated number of warnings issued
+  uint32 corner_cutting_warnings = 20;         // Accumulated number of corner cutting warnings issued
+  uint32 num_unserved_drive_through_pens = 21; // Num drive-through pens left to serve
+  uint32 num_unserved_stop_go_pens = 22;       // Num stop-go pens left to serve
+  uint32 grid_position = 23;                   // Grid position the vehicle started the race in
+  uint32 driver_status = 24;                   // Status of driver - 0 = in garage, 1 = flying lap, 2 = in lap, 3 = out lap, 4 = on track
+  uint32 result_status = 25;                   // Result status - 0 = invalid, 1 = inactive, 2 = active, 3 = finished, 4 = did not finish, 5 = disqualified, 6 = not classified, 7 = retired
+  uint32 pit_lane_timer_active = 26;           // Pit lane timing, 0 = inactive, 1 = active
+  uint32 pit_lane_time_in_lane_in_ms = 27;    // If active, the current time spent in the pit lane in ms
+  uint32 pit_stop_timer_in_ms = 28;            // Time of the actual pit stop in ms
+  uint32 pit_stop_should_serve_pen = 29;       // Whether the car should serve a penalty at this stop
+}
+
+// Lap data packet
+message PacketLapData {
+  PacketHeader header = 1;              // Header
+  repeated LapData lap_data = 2;        // Lap data for all cars on track
+  uint32 time_trial_pb_car_idx = 3;     // Index of Personal Best car in time trial (255 if invalid)
+  uint32 time_trial_rival_car_idx = 4;  // Index of Rival car in time trial (255 if invalid)
+}
+
+// Event data structures
+message FastestLapData {
+  uint32 vehicle_idx = 1; // Vehicle index of the car setting the fastest lap
+  float lap_time = 2;     // Lap time in seconds
+}
+
+message RetirementData {
+  uint32 vehicle_idx = 1; // Vehicle index of the car that retired
+}
+
+message TeamMateInPitsData {
+  uint32 vehicle_idx = 1; // Vehicle index of the team mate
+}
+
+message RaceWinnerData {
+  uint32 vehicle_idx = 1; // Vehicle index of the race winner
+}
+
+message PenaltyData {
+  uint32 penalty_type = 1;       // Penalty type – see docs
+  uint32 infringement_type = 2;  // Infringement type – see docs
+  uint32 vehicle_idx = 3;        // Vehicle index of the car the penalty is applied to
+  uint32 other_vehicle_idx = 4;  // Vehicle index of the other car involved
+  uint32 time = 5;               // Time gained, or time spent doing action in seconds
+  uint32 lap_num = 6;            // Lap the penalty occurred on
+  uint32 places_gained = 7;      // Number of places gained by this
+}
+
+message SpeedTrapData {
+  uint32 vehicle_idx = 1;                  // Vehicle index of the car triggering the speed trap
+  float speed = 2;                         // Top speed achieved in kilometres per hour
+  uint32 is_overall_fastest_in_session = 3; // Overall fastest in session
+  uint32 is_driver_fastest_in_session = 4;  // Fastest for driver in session
+  uint32 fastest_vehicle_idx_in_session = 5; // Vehicle index of the fastest vehicle in the session
+  float fastest_speed_in_session = 6;      // Speed of the fastest vehicle in the session
+}
+
+message StartLightsData {
+  uint32 num_lights = 1; // Number of lights showing
+}
+
+message DriveThroughPenaltyServedData {
+  uint32 vehicle_idx = 1; // Vehicle index of the car serving drive-through
+}
+
+message StopGoPenaltyServedData {
+  uint32 vehicle_idx = 1; // Vehicle index of the car serving stop-go
+}
+
+message FlashbackData {
+  uint32 flashback_frame_identifier = 1; // Frame identifier flashed back to
+  float flashback_session_time = 2;      // Session time flashed back to
+}
+
+message ButtonsData {
+  uint32 button_status = 1; // Bit flags specifying which buttons are being pressed
+}
+
+message OvertakeData {
+  uint32 overtaking_vehicle_idx = 1;      // Vehicle index of the overtaking car
+  uint32 being_overtaken_vehicle_idx = 2; // Vehicle index of the car being overtaken
+}
+
+// Event details - use oneof to represent the union
+message EventDataDetails {
+  oneof event {
+    FastestLapData fastest_lap = 1;
+    RetirementData retirement = 2;
+    TeamMateInPitsData team_mate_in_pits = 3;
+    RaceWinnerData race_winner = 4;
+    PenaltyData penalty = 5;
+    SpeedTrapData speed_trap = 6;
+    StartLightsData start_lights = 7;
+    DriveThroughPenaltyServedData drive_through_penalty_served = 8;
+    StopGoPenaltyServedData stop_go_penalty_served = 9;
+    FlashbackData flashback = 10;
+    ButtonsData buttons = 11;
+    OvertakeData overtake = 12;
+  }
+}
+
+// Event packet
+message PacketEventData {
+  PacketHeader header = 1;            // Header
+  string event_string_code = 2;       // Event string code
+  EventDataDetails event_details = 3; // Event details - should be interpreted based on event string code
+}
+
+// Participant data for a single car
+message ParticipantData {
+  uint32 ai_controlled = 1;    // Whether the vehicle is AI (1) or Human (0) controlled
+  uint32 driver_id = 2;        // Driver id - see appendix, 255 if network human
+  uint32 network_id = 3;       // Network id – unique identifier for network players
+  uint32 team_id = 4;          // Team id - see appendix
+  uint32 my_team = 5;          // My team flag – 1 = My Team, 0 = otherwise
+  uint32 race_number = 6;      // Race number of the car
+  uint32 nationality = 7;      // Nationality of the driver
+  string name = 8;             // Name of participant in UTF-8 format – null terminated
+                               // Will be truncated with … (U+2026) if too long
+  uint32 your_telemetry = 9;   // The player's UDP setting, 0 = restricted, 1 = public
+  uint32 show_online_names = 10; // The player's show online names setting, 0 = off, 1 = on
+  uint32 platform = 11;        // 1 = Steam, 3 = PlayStation, 4 = Xbox, 6 = Origin, 255 = unknown
+}
+
+// Participants packet
+message PacketParticipantsData {
+  PacketHeader header = 1;                 // Header
+  uint32 num_active_cars = 2;              // Number of active cars in the data – should match number of cars on HUD
+  repeated ParticipantData participants = 3; // Participant data array
+}
+
+// Car setup data for a single car
+message CarSetupData {
+  uint32 front_wing = 1;              // Front wing aero
+  uint32 rear_wing = 2;               // Rear wing aero
+  uint32 on_throttle = 3;             // Differential adjustment on throttle (percentage)
+  uint32 off_throttle = 4;            // Differential adjustment off throttle (percentage)
+  float front_camber = 5;             // Front camber angle (suspension geometry)
+  float rear_camber = 6;              // Rear camber angle (suspension geometry)
+  float front_toe = 7;                // Front toe angle (suspension geometry)
+  float rear_toe = 8;                 // Rear toe angle (suspension geometry)
+  uint32 front_suspension = 9;        // Front suspension
+  uint32 rear_suspension = 10;        // Rear suspension
+  uint32 front_anti_roll_bar = 11;    // Front anti-roll bar
+  uint32 rear_anti_roll_bar = 12;     // Rear anti-roll bar
+  uint32 front_suspension_height = 13; // Front ride height
+  uint32 rear_suspension_height = 14;  // Rear ride height
+  uint32 brake_pressure = 15;         // Brake pressure (percentage)
+  uint32 brake_bias = 16;             // Brake bias (percentage)
+  float rear_left_tyre_pressure = 17;  // Rear left tyre pressure (PSI)
+  float rear_right_tyre_pressure = 18; // Rear right tyre pressure (PSI)
+  float front_left_tyre_pressure = 19; // Front left tyre pressure (PSI)
+  float front_right_tyre_pressure = 20; // Front right tyre pressure (PSI)
+  uint32 ballast = 21;                // Ballast
+  float fuel_load = 22;               // Fuel load
+}
+
+// Car setup packet
+message PacketCarSetupData {
+  PacketHeader header = 1;              // Header
+  repeated CarSetupData car_setups = 2; // Setup data for all cars
+}
+
+// Car telemetry data for a single car
+message CarTelemetryData {
+  uint32 speed = 1;                           // Speed of car in kilometres per hour
+  float throttle = 2;                         // Amount of throttle applied (0.0 to 1.0)
+  float steer = 3;                            // Steering (-1.0 (full lock left) to 1.0 (full lock right))
+  float brake = 4;                            // Amount of brake applied (0.0 to 1.0)
+  uint32 clutch = 5;                          // Amount of clutch applied (0 to 100)
+  int32 gear = 6;                             // Gear selected (1-8, N=0, R=-1)
+  uint32 engine_rpm = 7;                      // Engine RPM
+  uint32 drs = 8;                             // 0 = off, 1 = on
+  uint32 rev_lights_percent = 9;              // Rev lights indicator (percentage)
+  uint32 rev_lights_bit_value = 10;           // Rev lights (bit 0 = leftmost LED, bit 14 = rightmost LED)
+  repeated uint32 brakes_temperature = 11;    // Brakes temperature (celsius)
+  repeated uint32 tyres_surface_temperature = 12; // Tyres surface temperature (celsius)
+  repeated uint32 tyres_inner_temperature = 13;   // Tyres inner temperature (celsius)
+  uint32 engine_temperature = 14;             // Engine temperature (celsius)
+  repeated float tyres_pressure = 15;         // Tyres pressure (PSI)
+  repeated uint32 surface_type = 16;          // Driving surface, see appendices
+}
+
+// Car telemetry packet
+message PacketCarTelemetryData {
+  PacketHeader header = 1;                       // Header
+  repeated CarTelemetryData car_telemetry_data = 2; // Telemetry data for all cars
+  uint32 mfd_panel_index = 3;                    // Index of MFD panel open - 255 = MFD closed
+                                                 // Single player, race – 0 = Car setup, 1 = Pits
+                                                 // 2 = Damage, 3 = Engine, 4 = Temperatures
+                                                 // May vary depending on game mode
+  uint32 mfd_panel_index_secondary_player = 4;   // See above
+  int32 suggested_gear = 5;                      // Suggested gear for the player (1-8)
+                                                 // 0 if no gear suggested
+}
+
+// Car status data for a single car
+message CarStatusData {
+  uint32 traction_control = 1;           // Traction control - 0 = off, 1 = medium, 2 = full
+  uint32 anti_lock_brakes = 2;           // 0 (off) - 1 (on)
+  uint32 fuel_mix = 3;                   // Fuel mix - 0 = lean, 1 = standard, 2 = rich, 3 = max
+  uint32 front_brake_bias = 4;           // Front brake bias (percentage)
+  uint32 pit_limiter_status = 5;         // Pit limiter status - 0 = off, 1 = on
+  float fuel_in_tank = 6;                // Current fuel mass
+  float fuel_capacity = 7;               // Fuel capacity
+  float fuel_remaining_laps = 8;         // Fuel remaining in terms of laps (value on MFD)
+  uint32 max_rpm = 9;                    // Car's max RPM, point of rev limiter
+  uint32 idle_rpm = 10;                  // Car's idle RPM
+  uint32 max_gears = 11;                 // Maximum number of gears
+  uint32 drs_allowed = 12;               // 0 = not allowed, 1 = allowed
+  uint32 drs_activation_distance = 13;   // 0 = DRS not available, non-zero - DRS will be available in [X] meters
+  uint32 actual_tyre_compound = 14;      // F1 Modern - 16 = C5, 17 = C4, 18 = C3, 19 = C2, 20 = C1
+                                         // 21 = C0, 7 = inter, 8 = wet
+                                         // F1 Classic - 9 = dry, 10 = wet
+                                         // F2 – 11 = super soft, 12 = soft, 13 = medium, 14 = hard
+                                         // 15 = wet
+  uint32 visual_tyre_compound = 15;      // F1 visual (can be different from actual compound)
+                                         // 16 = soft, 17 = medium, 18 = hard, 7 = inter, 8 = wet
+                                         // F1 Classic – same as above
+                                         // F2 '19, 15 = wet, 19 – super soft, 20 = soft
+                                         // 21 = medium, 22 = hard
+  uint32 tyres_age_laps = 16;            // Age in laps of the current set of tyres
+  int32 vehicle_fia_flags = 17;          // -1 = invalid/unknown, 0 = none, 1 = green
+                                         // 2 = blue, 3 = yellow
+  float engine_power_ice = 18;           // Engine power output of ICE (W)
+  float engine_power_mguk = 19;          // Engine power output of MGU-K (W)
+  float ers_store_energy = 20;           // ERS energy store in Joules
+  uint32 ers_deploy_mode = 21;           // ERS deployment mode, 0 = none, 1 = medium
+                                         // 2 = hotlap, 3 = overtake
+  float ers_harvested_this_lap_mguk = 22; // ERS energy harvested this lap by MGU-K
+  float ers_harvested_this_lap_mguh = 23; // ERS energy harvested this lap by MGU-H
+  float ers_deployed_this_lap = 24;      // ERS energy deployed this lap
+  uint32 network_paused = 25;            // Whether the car is paused in a network game
+}
+
+
+// Car status packet
+message PacketCarStatusData {
+  PacketHeader header = 1;                     // Header
+  repeated CarStatusData car_status_data = 2;  // Car status data for all cars
+}
+
+// Final classification data for a single car
+message FinalClassificationData {
+  uint32 position = 1;                   // Finishing position
+  uint32 num_laps = 2;                   // Number of laps completed
+  uint32 grid_position = 3;              // Grid position of the car
+  uint32 points = 4;                     // Number of points scored
+  uint32 num_pit_stops = 5;              // Number of pit stops made
+  uint32 result_status = 6;              // Result status - 0 = invalid, 1 = inactive, 2 = active
+                                         // 3 = finished, 4 = didnotfinish, 5 = disqualified
+                                         // 6 = not classified, 7 = retired
+  uint32 best_lap_time_in_ms = 7;        // Best lap time of the session in milliseconds
+  double total_race_time = 8;            // Total race time in seconds without penalties
+  uint32 penalties_time = 9;             // Total penalties accumulated in seconds
+  uint32 num_penalties = 10;             // Number of penalties applied to this driver
+  uint32 num_tyre_stints = 11;           // Number of tyre stints up to maximum
+  repeated uint32 tyre_stints_actual = 12;  // Actual tyres used by this driver
+  repeated uint32 tyre_stints_visual = 13;  // Visual tyres used by this driver
+  repeated uint32 tyre_stints_end_laps = 14; // The lap number stints end on
+}
+
+// Final classification packet
+message PacketFinalClassificationData {
+  PacketHeader header = 1;                                // Header
+  uint32 num_cars = 2;                                    // Number of cars in the final classification
+  repeated FinalClassificationData classification_data = 3; // Classification data for each car
+}
+
+// Lobby info data for a single player
+message LobbyInfoData {
+  uint32 ai_controlled = 1; // Whether the vehicle is AI (1) or Human (0) controlled
+  uint32 team_id = 2;       // Team id - see appendix (255 if no team currently selected)
+  uint32 nationality = 3;   // Nationality of the driver
+  uint32 platform = 4;      // 1 = Steam, 3 = PlayStation, 4 = Xbox, 6 = Origin, 255 = unknown
+  string name = 5;          // Name of participant in UTF-8 format – null terminated
+                            // Will be truncated with ... (U+2026) if too long
+  uint32 car_number = 6;    // Car number of the player
+  uint32 ready_status = 7;  // 0 = not ready, 1 = ready, 2 = spectating
+}
+
+// Lobby info packet
+message PacketLobbyInfoData {
+  PacketHeader header = 1;                // Header
+  uint32 num_players = 2;                 // Number of players in the lobby data
+  repeated LobbyInfoData lobby_players = 3; // Lobby player information
+}
+
+// Car damage data for a single car
+message CarDamageData {
+  repeated float tyres_wear = 1;           // Tyre wear (percentage)
+  repeated uint32 tyres_damage = 2;        // Tyre damage (percentage)
+  repeated uint32 brakes_damage = 3;       // Brakes damage (percentage)
+  uint32 front_left_wing_damage = 4;       // Front left wing damage (percentage)
+  uint32 front_right_wing_damage = 5;      // Front right wing damage (percentage)
+  uint32 rear_wing_damage = 6;             // Rear wing damage (percentage)
+  uint32 floor_damage = 7;                 // Floor damage (percentage)
+  uint32 diffuser_damage = 8;              // Diffuser damage (percentage)
+  uint32 sidepod_damage = 9;               // Sidepod damage (percentage)
+  uint32 drs_fault = 10;                   // Indicator for DRS fault, 0 = OK, 1 = fault
+  uint32 ers_fault = 11;                   // Indicator for ERS fault, 0 = OK, 1 = fault
+  uint32 gear_box_damage = 12;             // Gear box damage (percentage)
+  uint32 engine_damage = 13;               // Engine damage (percentage)
+  uint32 engine_mguh_wear = 14;            // Engine wear MGU-H (percentage)
+  uint32 engine_es_wear = 15;              // Engine wear ES (percentage)
+  uint32 engine_ce_wear = 16;              // Engine wear CE (percentage)
+  uint32 engine_ice_wear = 17;             // Engine wear ICE (percentage)
+  uint32 engine_mguk_wear = 18;            // Engine wear MGU-K (percentage)
+  uint32 engine_tc_wear = 19;              // Engine wear TC (percentage)
+  uint32 engine_blown = 20;                // Engine blown, 0 = OK, 1 = fault
+  uint32 engine_seized = 21;               // Engine seized, 0 = OK, 1 = fault
+}
+
+// Car damage packet
+message PacketCarDamageData {
+  PacketHeader header = 1;                     // Header
+  repeated CarDamageData car_damage_data = 2;  // Car damage data for 22 cars
+}
+
+// Lap history data for a single lap
+message LapHistoryData {
+  uint32 lap_time_in_ms = 1;       // Lap time in milliseconds
+  uint32 sector1_time_in_ms = 2;   // Sector 1 time in milliseconds
+  uint32 sector1_time_minutes = 3; // Sector 1 whole minute part
+  uint32 sector2_time_in_ms = 4;   // Sector 2 time in milliseconds
+  uint32 sector2_time_minutes = 5; // Sector 2 whole minute part
+  uint32 sector3_time_in_ms = 6;   // Sector 3 time in milliseconds
+  uint32 sector3_time_minutes = 7; // Sector 3 whole minute part
+  uint32 lap_valid_bit_flags = 8;  // 0x01 bit set-lap valid, 0x02 bit set-sector 1 valid
+                                   // 0x04 bit set-sector 2 valid, 0x08 bit set-sector 3 valid
+}
+
+// Tyre stint history data
+message TyreStintHistoryData {
+  uint32 end_lap = 1;              // Lap the tyre usage ends on (255 if current tyre)
+  uint32 tyre_actual_compound = 2; // Actual tyres used by this driver
+  uint32 tyre_visual_compound = 3; // Visual tyres used by this driver
+}
+
+// Session history packet
+message PacketSessionHistoryData {
+  PacketHeader header = 1;                                // Header
+  uint32 car_idx = 2;                                     // Index of the car this lap data relates to
+  uint32 num_laps = 3;                                    // Number of laps in the data (including current partial lap)
+  uint32 num_tyre_stints = 4;                             // Number of tyre stints in the data
+  uint32 best_lap_time_lap_num = 5;                       // Lap the best lap time was achieved on
+  uint32 best_sector1_lap_num = 6;                        // Lap the best Sector 1 time was achieved on
+  uint32 best_sector2_lap_num = 7;                        // Lap the best Sector 2 time was achieved on
+  uint32 best_sector3_lap_num = 8;                        // Lap the best Sector 3 time was achieved on
+  repeated LapHistoryData lap_history_data = 9;           // 100 laps of data max
+  repeated TyreStintHistoryData tyre_stints_history_data = 10;
+}
+
+// Tyre set data for a single tyre set
+message TyreSetData {
+  uint32 actual_tyre_compound = 1; // Actual tyre compound used
+  uint32 visual_tyre_compound = 2; // Visual tyre compound used
+  uint32 wear = 3;                 // Tyre wear (percentage)
+  uint32 available = 4;            // Whether this set is currently available
+  uint32 recommended_session = 5;  // Recommended session for tyre set
+  uint32 life_span = 6;            // Laps left in this tyre set
+  uint32 usable_life = 7;          // Max number of laps recommended for this compound
+  int32 lap_delta_time = 8;        // Lap delta time in milliseconds compared to fitted set
+  uint32 fitted = 9;               // Whether the set is fitted or not
+}
+
+// Tyre sets packet
+message PacketTyreSetsData {
+  PacketHeader header = 1;               // Header
+  uint32 car_idx = 2;                    // Index of the car this data relates to
+  repeated TyreSetData tyre_set_data = 3; // 13 (dry) + 7 (wet)
+  uint32 fitted_idx = 4;                 // Index into array of fitted tyre
+}
+
+// Motion extended data packet
+message PacketMotionExData {
+  PacketHeader header = 1;                       // Header
+  repeated float suspension_position = 2;        // Suspension position for each wheel (RL, RR, FL, FR)
+  repeated float suspension_velocity = 3;        // Suspension velocity for each wheel
+  repeated float suspension_acceleration = 4;    // Suspension acceleration for each wheel
+  repeated float wheel_speed = 5;                // Speed of each wheel
+  repeated float wheel_slip_ratio = 6;           // Slip ratio for each wheel
+  repeated float wheel_slip_angle = 7;           // Slip angles for each wheel
+  repeated float wheel_lat_force = 8;            // Lateral forces for each wheel
+  repeated float wheel_long_force = 9;           // Longitudinal forces for each wheel
+  float height_of_cog_above_ground = 10;         // Height of centre of gravity above ground
+  float local_velocity_x = 11;                   // Velocity in local space – metres/s
+  float local_velocity_y = 12;                   // Velocity in local space
+  float local_velocity_z = 13;                   // Velocity in local space
+  float angular_velocity_x = 14;                 // Angular velocity x-component – radians/s
+  float angular_velocity_y = 15;                 // Angular velocity y-component
+  float angular_velocity_z = 16;                 // Angular velocity z-component
+  float angular_acceleration_x = 17;             // Angular acceleration x-component – radians/s/s
+  float angular_acceleration_y = 18;             // Angular acceleration y-component
+  float angular_acceleration_z = 19;             // Angular acceleration z-component
+  float front_wheels_angle = 20;                 // Current front wheels angle in radians
+  repeated float wheel_vert_force = 21;          // Vertical forces for each wheel
+}
