@@ -5,7 +5,8 @@
         "context": "..",
         "target": "development"
     },
-    "workspaceFolder": "/app",
+    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-simulator",
+    "workspaceMount": "source=${localWorkspaceFolder}/../..,target=/workspaces/F1-Telemetry,type=bind",
     "runArgs": [
         "--network=host"
     ],

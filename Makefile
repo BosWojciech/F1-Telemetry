@@ -125,8 +125,8 @@ proto: setup-proto ## Generate protobuf files
 	@echo "$(BLUE)Generating protobuf files for F1 $(F1_GAME_VERSION)...$(NC)"
 	@mkdir -p $(SIMULATOR_PROTO_DIR)
 	@touch $(SIMULATOR_PROTO_DIR)/__init__.py
-	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto
-	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/packet_definitions.proto
+	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) --pyi_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto
+	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) --pyi_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/packet_definitions.proto
 	@echo "$(GREEN)Protobuf files generated in $(SIMULATOR_PROTO_DIR)$(NC)"
 
 # Cleanup commands
