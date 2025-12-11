@@ -120,7 +120,9 @@ The project uses Protocol Buffers for data definitions. To generate the necessar
     ```bash
     make proto
     ```
-    This will generate Python code in `services/telemetry-simulator-backend/proto` and TypeScript code in `services/telemetry-simulator-frontend/proto`.
+    This generates protobuf files for both backend and frontend:
+    - Python files → `services/telemetry-simulator-backend/proto`
+    - TypeScript files → `services/telemetry-simulator-frontend/src/proto` (requires `npm install` first)
 
     You can specify the F1 game version (default is 23):
     ```bash

@@ -108,14 +108,11 @@ shell-simulator-backend: ## Open shell in telemetry-simulator-backend container
 shell-simulator-frontend: ## Open shell in telemetry-simulator-frontend container
 	docker-compose exec telemetry-simulator-frontend /bin/sh
 
-shell-simulator: ## Open shell in telemetry-simulator container
-	docker-compose exec telemetry-simulator /bin/sh
-
 # Protobuf
 F1_GAME_VERSION ?= 23
 PROTO_SRC_DIR := proto/f1_$(F1_GAME_VERSION)
 SIMULATOR_BACKEND_PROTO_DIR := services/telemetry-simulator-backend/proto
-SIMULATOR_FRONTEND_PROTO_DIR := services/telemetry-simulator-frontend/proto
+SIMULATOR_FRONTEND_PROTO_DIR := services/telemetry-simulator-frontend/src/proto
 
 .PHONY: setup-proto proto proto-backend proto-frontend
 
@@ -136,25 +133,41 @@ setup-proto: ## Check if protoc is installed
 proto: proto-backend proto-frontend ## Generate all protobuf files
 
 proto-backend: setup-proto ## Generate protobuf files for simulator backend
-	@echo "$(BLUE)Generating protobuf files for simulator backend (F1 $(F1_GAME_VERSION))...$(NC)"
+proto: setup-proto ## Generate all protobuf files
+	@echo "$(BLUE)Generating protobuf files for F1 $(F1_GAME_VERSION)...$(NC)"
+	@echo ""
+	@$(MAKE) proto-backend
+	@echo ""
+	@$(MAKE) proto-frontend
+	@echo ""
+	@echo "$(GREEN)✅ All protobuf files generated!$(NC)"
+
+proto-backend: setup-proto ## Generate protobuf files for simulator backend
+	@echo "$(BLUE)→ Generating Python protobuf files for simulator backend...$(NC)"
 	@mkdir -p $(SIMULATOR_BACKEND_PROTO_DIR)
 	@touch $(SIMULATOR_BACKEND_PROTO_DIR)/__init__.py
 	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_BACKEND_PROTO_DIR) --pyi_out=$(SIMULATOR_BACKEND_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto
 	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_BACKEND_PROTO_DIR) --pyi_out=$(SIMULATOR_BACKEND_PROTO_DIR) $(PROTO_SRC_DIR)/packet_definitions.proto
-	@echo "$(GREEN)Backend protobuf files generated in $(SIMULATOR_BACKEND_PROTO_DIR)$(NC)"
+	@echo "$(GREEN)  ✓ Backend protobuf files generated in $(SIMULATOR_BACKEND_PROTO_DIR)$(NC)"
 
-proto-frontend: setup-proto ## Generate protobuf files for simulator frontend
-	@echo "$(BLUE)Generating protobuf files for simulator frontend (F1 $(F1_GAME_VERSION))...$(NC)"
+proto-frontend: setup-proto ## Generate protobuf files for simulator frontend (using ts-proto)
+	@echo "$(BLUE)→ Generating TypeScript protobuf files for simulator frontend...$(NC)"
 	@mkdir -p $(SIMULATOR_FRONTEND_PROTO_DIR)
-	protoc -I$(PROTO_SRC_DIR) --js_out=import_style=commonjs,binary:$(SIMULATOR_FRONTEND_PROTO_DIR) --ts_out=$(SIMULATOR_FRONTEND_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto $(PROTO_SRC_DIR)/packet_definitions.proto || \
-		(echo "$(RED)Warning: JavaScript/TypeScript protobuf generation requires protoc-gen-js and protoc-gen-ts$(NC)" && \
-		 echo "$(BLUE)Install with: npm install -g protoc-gen-js protoc-gen-ts$(NC)" && \
-		 echo "$(BLUE)Or use ts-proto: npm install --save-dev ts-proto$(NC)" && \
-		 echo "$(BLUE)Skipping frontend proto generation for now...$(NC)")
-	@echo "$(GREEN)Frontend protobuf files generated (if plugins available) in $(SIMULATOR_FRONTEND_PROTO_DIR)$(NC)"
-
-# Cleanup commands
-clean: ## Remove all containers, volumes, and images
+	@cd services/telemetry-simulator-frontend && \
+		if [ -d "node_modules" ]; then \
+			npx protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/proto \
+				--ts_proto_opt=esModuleInterop=true \
+				--ts_proto_opt=outputClientImpl=false \
+				-I../../$(PROTO_SRC_DIR) \
+				../../$(PROTO_SRC_DIR)/enums.proto \
+				../../$(PROTO_SRC_DIR)/packet_definitions.proto 2>/dev/null || \
+				(echo "$(RED)  ✗ ts-proto not installed. Install with: cd services/telemetry-simulator-frontend && npm install ts-proto$(NC)" && \
+				 echo "$(BLUE)    Skipping frontend proto generation...$(NC)"); \
+		else \
+			echo "$(RED)  ✗ node_modules not found. Run: cd services/telemetry-simulator-frontend && npm install$(NC)"; \
+			echo "$(BLUE)    Skipping frontend proto generation...$(NC)"; \
+		fi
+	@echo "$(GREEN)  ✓ Frontend protobuf generation completed$(NC)"
 	@echo "$(RED)Cleaning up all resources...$(NC)"
 	docker-compose down -v --rmi all
 	@echo "$(GREEN)Cleanup complete!$(NC)"

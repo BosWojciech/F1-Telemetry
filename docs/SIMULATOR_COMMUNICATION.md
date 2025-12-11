@@ -125,6 +125,8 @@ Only if you need:
 - [ ] Optional: Add WebSocket server for updates
 
 ### Frontend (React)
+- [x] Install dependencies: `cd services/telemetry-simulator-frontend && npm install`
+- [x] Generate protobuf types: `make proto` (uses ts-proto for TypeScript)
 - [ ] Create UI for simulation controls
 - [ ] Add scenario selector/loader
 - [ ] Implement API client (fetch/axios)
