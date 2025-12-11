@@ -1,51 +1,47 @@
-# Multi-stage build for Python Telemetry Simulator Service
+# Multi-stage Dockerfile for F1 Telemetry Simulator FastAPI Backend
 
 # ============================================
-# Stage 1: Base Stage
+# Base Stage - Install Poetry
 # ============================================
 FROM python:3.11-slim AS base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    POETRY_VERSION=1.7.1 \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_NO_INTERACTION=1
 
 WORKDIR /app
 
+# Install system dependencies and Poetry
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sSL https://install.python-poetry.org | python3 - \
+    && ln -s /opt/poetry/bin/poetry /usr/local/bin/poetry
+
 # ============================================
-# Stage 2: Dependencies Stage
+# Dependencies Stage
 # ============================================
 FROM base AS dependencies
 
-COPY requirements.txt .
-
-RUN python -m venv /app/.venv && \
-    /app/.venv/bin/pip install --upgrade pip && \
-    /app/.venv/bin/pip install -r requirements.txt
+COPY pyproject.toml poetry.lock* ./
+RUN poetry install --no-root --only main
 
 # ============================================
-# Stage 3: Development Stage
+# Development Stage
 # ============================================
 FROM base AS development
 
-# Install development tools
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    vim \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy virtual environment from dependencies stage
-COPY --from=dependencies /app/.venv /app/.venv
+# Copy pyproject.toml and install all dependencies (including dev)
+COPY pyproject.toml poetry.lock* ./
+RUN poetry install --no-root
 
 # Copy application code
 COPY . .
-
-# Install development dependencies
-RUN /app/.venv/bin/pip install debugpy pytest black flake8 mypy
-
-# Add virtual environment to PATH
-ENV PATH="/app/.venv/bin:$PATH"
 
 # Create non-root user
 RUN useradd -m -u 1000 -s /bin/bash telemetry && \
@@ -53,34 +49,32 @@ RUN useradd -m -u 1000 -s /bin/bash telemetry && \
 
 USER telemetry
 
-EXPOSE 5679
+EXPOSE 8000
 
-CMD ["python", "simulator.py"]
+CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # ============================================
-# Stage 4: Runtime Stage (Production)
+# Production Stage
 # ============================================
-FROM base AS runtime
+FROM base AS production
 
 # Copy virtual environment from dependencies stage
 COPY --from=dependencies /app/.venv /app/.venv
 
 # Copy application code
-COPY simulator.py .
-COPY packet_generator.py .
-COPY config/ config/
+COPY main.py ./
+COPY proto/ proto/
 
-# Add virtual environment to PATH
-ENV PATH="/app/.venv/bin:$PATH"
-
-# Create non-root user for security
+# Create non-root user
 RUN useradd -m -u 1000 -s /bin/bash telemetry && \
     chown -R telemetry:telemetry /app
 
 USER telemetry
 
+EXPOSE 8000
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.close()" || exit 1
+    CMD ["/app/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
 
-CMD ["python", "simulator.py"]
+CMD ["/app/.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

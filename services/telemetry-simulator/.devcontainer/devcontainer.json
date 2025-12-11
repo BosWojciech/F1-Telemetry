@@ -1,48 +1,68 @@
 {
-    "name": "F1 Telemetry Simulator (Python)",
+    "name": "F1 Telemetry Simulator - FastAPI Backend",
     "build": {
         "dockerfile": "../Dockerfile",
         "context": "..",
         "target": "development"
     },
-    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-simulator",
-    "runArgs": ["--network=host"],
-    
+    "workspaceFolder": "/app",
+    "runArgs": [
+        "--network=host"
+    ],
     "features": {
-        "ghcr.io/devcontainers/features/git:1": {}
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.11"
+        }
     },
-    
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "ms-python.black-formatter",
-                "ms-python.flake8",
-                "ms-python.debugpy",
-                "charliermarsh.ruff"
+                "charliermarsh.ruff",
+                "ms-python.debugpy"
             ],
             "settings": {
-                "python.defaultInterpreterPath": "/usr/local/bin/python",
-                "python.linting.enabled": true,
-                "python.linting.flake8Enabled": true,
-                "python.formatting.provider": "black",
+                "python.defaultInterpreterPath": "/app/.venv/bin/python",
+                "python.terminal.activateEnvironment": true,
                 "editor.formatOnSave": true,
                 "editor.codeActionsOnSave": {
                     "source.organizeImports": "explicit"
-                }
+                },
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.black-formatter"
+                },
+                "python.testing.pytestEnabled": true,
+                "python.testing.unittestEnabled": false,
+                "python.analysis.exclude": [
+                    "**/proto/**",
+                    "**/*_pb2.py"
+                ],
+                "python.analysis.ignore": [
+                    "**/proto/**",
+                    "**/*_pb2.py"
+                ],
+                "python.analysis.extraPaths": [
+                    "${workspaceFolder}"
+                ]
             }
         }
     },
-    
-    "forwardPorts": [5679],
+    "forwardPorts": [
+        8000,
+        5678
+    ],
     "portsAttributes": {
-        "5679": {
+        "8000": {
+            "label": "FastAPI",
+            "onAutoForward": "notify"
+        },
+        "5678": {
             "label": "Python Debugger"
         }
     },
-    
-    "postCreateCommand": "pip install -r requirements.txt && pip install debugpy pytest pytest-cov black flake8 mypy",
-    
-    "remoteUser": "root"
+    "postCreateCommand": "poetry install",
+    "remoteUser": "telemetry"
 }
