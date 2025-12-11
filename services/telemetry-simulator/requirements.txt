@@ -3,6 +3,8 @@
 
 # For future enhancements
 structlog>=23.1.0  # Structured logging (optional)
+protobuf>=4.24.0
+grpcio-tools>=1.58.0
 
 # Testing dependencies
 pytest>=7.4.0
