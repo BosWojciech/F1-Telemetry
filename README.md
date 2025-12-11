@@ -120,7 +120,7 @@ The project uses Protocol Buffers for data definitions. To generate the necessar
     ```bash
     make proto
     ```
-    This will generate Python code in `services/telemetry-simulator/proto`.
+    This will generate Python code in `services/telemetry-simulator-backend/proto` and TypeScript code in `services/telemetry-simulator-frontend/proto`.
 
     You can specify the F1 game version (default is 23):
     ```bash
@@ -200,8 +200,9 @@ make test-coverage
 
 # View reports
 open services/telemetry-processor/htmlcov/index.html
-open services/telemetry-simulator/htmlcov/index.html
+open services/telemetry-simulator-backend/htmlcov/index.html
 open services/telemetry-frontend/coverage/index.html
+open services/telemetry-simulator-frontend/coverage/index.html
 ```
 
 ### Test Statistics
@@ -210,8 +211,9 @@ open services/telemetry-frontend/coverage/index.html
 |---------|---------------|-----------|----------|
 | **telemetry-ingest** | Google Test | 9 | >50% |
 | **telemetry-processor** | pytest | 32 | >50% |
-| **telemetry-simulator** | pytest | 29 | >50% |
+| **telemetry-simulator-backend** | pytest | 29 | >50% |
 | **telemetry-frontend** | Vitest | 21 | >50% |
+| **telemetry-simulator-frontend** | Vitest | TBD | >50% |
 | **E2E Tests** | pytest | 7 | N/A |
 
 ### CI/CD Testing

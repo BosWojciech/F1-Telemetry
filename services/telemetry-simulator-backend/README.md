@@ -26,10 +26,10 @@ This service simulates realistic F1 game telemetry packets, allowing you to test
 
 ```bash
 # Start simulator with other services
-docker-compose up telemetry-simulator
+docker-compose up telemetry-simulator-backend
 
 # Or in development mode
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up telemetry-simulator
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up telemetry-simulator-backend
 ```
 
 ### Local Development
@@ -137,7 +137,7 @@ cd ../../
 docker-compose up telemetry-ingest
 
 # Terminal 2: Run simulator
-cd services/telemetry-simulator
+cd services/telemetry-simulator-backend
 python simulator.py --target-host localhost
 ```
 
@@ -209,12 +209,12 @@ Follows F1 2023/2024 UDP telemetry specification:
 
 2. Verify network connectivity:
    ```bash
-   docker-compose exec telemetry-simulator ping telemetry-ingest
+   docker-compose exec telemetry-simulator-backend ping telemetry-ingest
    ```
 
 3. Check logs:
    ```bash
-   docker-compose logs telemetry-simulator
+   docker-compose logs telemetry-simulator-backend
    docker-compose logs telemetry-ingest
    ```
 

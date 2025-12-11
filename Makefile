@@ -20,8 +20,9 @@ up: ## Start all services in production mode
 	@echo "$(BLUE)Starting all services in production mode...$(NC)"
 	docker-compose up -d
 	@echo "$(GREEN)Services started successfully!$(NC)"
-	@echo "Frontend: http://localhost:3000"
-	@echo "WebSocket: ws://localhost:8765"
+	@echo "Telemetry Dashboard: http://localhost:3000"
+	@echo "Simulator Frontend:  http://localhost:3001"
+	@echo "WebSocket:           ws://localhost:8765"
 
 down: ## Stop all services
 	@echo "$(RED)Stopping all services...$(NC)"
@@ -36,9 +37,10 @@ dev-up: ## Start all services in development mode with hot reload
 	@echo "$(BLUE)Starting all services in development mode...$(NC)"
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 	@echo "$(GREEN)Development services started!$(NC)"
-	@echo "Frontend: http://localhost:5173"
-	@echo "WebSocket: ws://localhost:8765"
-	@echo "Python Debugger: localhost:5678"
+	@echo "Telemetry Dashboard: http://localhost:5173"
+	@echo "Simulator Frontend:  http://localhost:5174"
+	@echo "WebSocket:           ws://localhost:8765"
+	@echo "Python Debugger:     localhost:5678"
 
 dev-down: ## Stop development services
 	@echo "$(RED)Stopping development services...$(NC)"
@@ -60,8 +62,11 @@ logs-processor: ## View logs from telemetry-processor service
 logs-frontend: ## View logs from telemetry-frontend service
 	docker-compose logs -f telemetry-frontend
 
-logs-simulator: ## View logs from telemetry-simulator service
-	docker-compose logs -f telemetry-simulator
+logs-simulator-backend: ## View logs from telemetry-simulator-backend service
+	docker-compose logs -f telemetry-simulator-backend
+
+logs-simulator-frontend: ## View logs from telemetry-simulator-frontend service
+	docker-compose logs -f telemetry-simulator-frontend
 
 # Utility commands
 ps: ## List running services
@@ -78,11 +83,14 @@ restart: ## Restart all services
 restart-ingest: ## Restart telemetry-ingest service
 	docker-compose restart telemetry-ingest
 
-restart-processor: ## Restart telemetry-processor service
-	docker-compose restart telemetry-processor
-
 restart-frontend: ## Restart telemetry-frontend service
 	docker-compose restart telemetry-frontend
+
+restart-simulator-backend: ## Restart telemetry-simulator-backend service
+	docker-compose restart telemetry-simulator-backend
+
+restart-simulator-frontend: ## Restart telemetry-simulator-frontend service
+	docker-compose restart telemetry-simulator-frontend
 
 restart-simulator: ## Restart telemetry-simulator service
 	docker-compose restart telemetry-simulator
@@ -91,11 +99,14 @@ restart-simulator: ## Restart telemetry-simulator service
 shell-ingest: ## Open shell in telemetry-ingest container
 	docker-compose exec telemetry-ingest /bin/bash
 
-shell-processor: ## Open shell in telemetry-processor container
-	docker-compose exec telemetry-processor /bin/bash
-
 shell-frontend: ## Open shell in telemetry-frontend container
 	docker-compose exec telemetry-frontend /bin/sh
+
+shell-simulator-backend: ## Open shell in telemetry-simulator-backend container
+	docker-compose exec telemetry-simulator-backend /bin/sh
+
+shell-simulator-frontend: ## Open shell in telemetry-simulator-frontend container
+	docker-compose exec telemetry-simulator-frontend /bin/sh
 
 shell-simulator: ## Open shell in telemetry-simulator container
 	docker-compose exec telemetry-simulator /bin/sh
@@ -103,9 +114,10 @@ shell-simulator: ## Open shell in telemetry-simulator container
 # Protobuf
 F1_GAME_VERSION ?= 23
 PROTO_SRC_DIR := proto/f1_$(F1_GAME_VERSION)
-SIMULATOR_PROTO_DIR := services/telemetry-simulator/proto
+SIMULATOR_BACKEND_PROTO_DIR := services/telemetry-simulator-backend/proto
+SIMULATOR_FRONTEND_PROTO_DIR := services/telemetry-simulator-frontend/proto
 
-.PHONY: setup-proto proto
+.PHONY: setup-proto proto proto-backend proto-frontend
 
 setup-proto: ## Check if protoc is installed
 	@echo "$(BLUE)Checking for protoc installation...$(NC)"
@@ -121,13 +133,25 @@ setup-proto: ## Check if protoc is installed
 		 exit 1)
 	@echo "$(GREEN)protoc found: $$(protoc --version)$(NC)"
 
-proto: setup-proto ## Generate protobuf files
-	@echo "$(BLUE)Generating protobuf files for F1 $(F1_GAME_VERSION)...$(NC)"
-	@mkdir -p $(SIMULATOR_PROTO_DIR)
-	@touch $(SIMULATOR_PROTO_DIR)/__init__.py
-	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) --pyi_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto
-	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_PROTO_DIR) --pyi_out=$(SIMULATOR_PROTO_DIR) $(PROTO_SRC_DIR)/packet_definitions.proto
-	@echo "$(GREEN)Protobuf files generated in $(SIMULATOR_PROTO_DIR)$(NC)"
+proto: proto-backend proto-frontend ## Generate all protobuf files
+
+proto-backend: setup-proto ## Generate protobuf files for simulator backend
+	@echo "$(BLUE)Generating protobuf files for simulator backend (F1 $(F1_GAME_VERSION))...$(NC)"
+	@mkdir -p $(SIMULATOR_BACKEND_PROTO_DIR)
+	@touch $(SIMULATOR_BACKEND_PROTO_DIR)/__init__.py
+	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_BACKEND_PROTO_DIR) --pyi_out=$(SIMULATOR_BACKEND_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto
+	protoc -I$(PROTO_SRC_DIR) --python_out=$(SIMULATOR_BACKEND_PROTO_DIR) --pyi_out=$(SIMULATOR_BACKEND_PROTO_DIR) $(PROTO_SRC_DIR)/packet_definitions.proto
+	@echo "$(GREEN)Backend protobuf files generated in $(SIMULATOR_BACKEND_PROTO_DIR)$(NC)"
+
+proto-frontend: setup-proto ## Generate protobuf files for simulator frontend
+	@echo "$(BLUE)Generating protobuf files for simulator frontend (F1 $(F1_GAME_VERSION))...$(NC)"
+	@mkdir -p $(SIMULATOR_FRONTEND_PROTO_DIR)
+	protoc -I$(PROTO_SRC_DIR) --js_out=import_style=commonjs,binary:$(SIMULATOR_FRONTEND_PROTO_DIR) --ts_out=$(SIMULATOR_FRONTEND_PROTO_DIR) $(PROTO_SRC_DIR)/enums.proto $(PROTO_SRC_DIR)/packet_definitions.proto || \
+		(echo "$(RED)Warning: JavaScript/TypeScript protobuf generation requires protoc-gen-js and protoc-gen-ts$(NC)" && \
+		 echo "$(BLUE)Install with: npm install -g protoc-gen-js protoc-gen-ts$(NC)" && \
+		 echo "$(BLUE)Or use ts-proto: npm install --save-dev ts-proto$(NC)" && \
+		 echo "$(BLUE)Skipping frontend proto generation for now...$(NC)")
+	@echo "$(GREEN)Frontend protobuf files generated (if plugins available) in $(SIMULATOR_FRONTEND_PROTO_DIR)$(NC)"
 
 # Cleanup commands
 clean: ## Remove all containers, volumes, and images
@@ -178,16 +202,16 @@ test-processor: ## Run Python telemetry-processor tests
 	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
 	@echo "$(BLUE)🐍 Running Python Tests (telemetry-processor)$(NC)"
 	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
-	@echo ""
-	@cd services/telemetry-processor && \
-		pytest tests/ -v --cov=. --cov-report=term-missing --cov-fail-under=50
-	@echo ""
-	@echo "$(GREEN)✅ Processor tests passed!$(NC)"
-
-test-simulator: ## Run Python telemetry-simulator tests
+test-simulator: ## Run Python telemetry-simulator-backend tests
 	@echo ""
 	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
-	@echo "$(BLUE)🐍 Running Python Tests (telemetry-simulator)$(NC)"
+	@echo "$(BLUE)🐍 Running Python Tests (telemetry-simulator-backend)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@cd services/telemetry-simulator-backend && \
+		pytest tests/ -v --cov=. --cov-report=term-missing --cov-fail-under=50
+	@echo ""
+	@echo "$(GREEN)✅ Simulator tests passed!$(NC)"ry-simulator)$(NC)"
 	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
 	@echo ""
 	@cd services/telemetry-simulator && \
@@ -218,12 +242,6 @@ test-e2e: ## Run end-to-end integration tests
 		docker-compose up -d; \
 		echo "Waiting 10 seconds for services to be ready..."; \
 		sleep 10; \
-	fi
-	@cd tests/e2e && \
-		pytest test_pipeline.py -v
-	@echo ""
-	@echo "$(GREEN)✅ E2E tests passed!$(NC)"
-
 test-coverage: ## Generate coverage reports for all services
 	@echo ""
 	@echo "$(BLUE)═══════════════════════════════════════════════════════$(NC)"
@@ -233,20 +251,31 @@ test-coverage: ## Generate coverage reports for all services
 	@echo "➜ Python Processor Coverage..."
 	@cd services/telemetry-processor && pytest tests/ --cov=. --cov-report=html
 	@echo ""
-	@echo "➜ Python Simulator Coverage..."
-	@cd services/telemetry-simulator && pytest tests/ --cov=. --cov-report=html
+	@echo "➜ Python Simulator Backend Coverage..."
+	@cd services/telemetry-simulator-backend && pytest tests/ --cov=. --cov-report=html
 	@echo ""
 	@echo "➜ Frontend Coverage..."
 	@cd services/telemetry-frontend && npm run test:coverage
 	@echo ""
+	@echo "➜ Simulator Frontend Coverage..."
+	@cd services/telemetry-simulator-frontend && npm run test:coverage
+	@echo ""
 	@echo "$(GREEN)✅ Coverage reports generated!$(NC)"
 	@echo ""
 	@echo "View reports:"
-	@echo "  Processor:  services/telemetry-processor/htmlcov/index.html"
-	@echo "  Simulator:  services/telemetry-simulator/htmlcov/index.html"
-	@echo "  Frontend:   services/telemetry-frontend/coverage/index.html"
-
+	@echo "  Processor:          services/telemetry-processor/htmlcov/index.html"
+	@echo "  Simulator Backend:  services/telemetry-simulator-backend/htmlcov/index.html"
+	@echo "  Frontend:           services/telemetry-frontend/coverage/index.html"
+	@echo "  Simulator Frontend: services/telemetry-simulator-frontend/coverage/index.html"
 test-clean: ## Clean test artifacts and coverage reports
+	@echo "$(BLUE)🧹 Cleaning test artifacts...$(NC)"
+	@rm -rf services/telemetry-ingest/build/Testing
+	@rm -rf services/telemetry-processor/htmlcov services/telemetry-processor/.coverage services/telemetry-processor/.pytest_cache
+	@rm -rf services/telemetry-simulator-backend/htmlcov services/telemetry-simulator-backend/.coverage services/telemetry-simulator-backend/.pytest_cache
+	@rm -rf services/telemetry-frontend/coverage
+	@rm -rf services/telemetry-simulator-frontend/coverage
+	@rm -rf tests/e2e/htmlcov tests/e2e/.coverage tests/e2e/.pytest_cache
+	@echo "$(GREEN)✅ Test artifacts cleaned!$(NC)"e reports
 	@echo "$(BLUE)🧹 Cleaning test artifacts...$(NC)"
 	@rm -rf services/telemetry-ingest/build/Testing
 	@rm -rf services/telemetry-processor/htmlcov services/telemetry-processor/.coverage services/telemetry-processor/.pytest_cache

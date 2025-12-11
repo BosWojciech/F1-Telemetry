@@ -47,10 +47,10 @@ open http://localhost:3000
 
 ```bash
 # Start services with simulator
-docker-compose -f docker-compose.yml -f docker-compose.simulator.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 # Simulator will send test packets to UDP port 20777
-docker-compose logs -f telemetry-simulator
+docker-compose logs -f telemetry-simulator-backend
 ```
 
 ---
@@ -118,10 +118,11 @@ Each service has a standalone `.devcontainer` configuration for independent deve
 **Multi-Service Workflow:**
 ```bash
 # Open multiple services simultaneously in separate VS Code windows
-code services/telemetry-simulator    # Window 1: Simulator
-code services/telemetry-ingest       # Window 2: Ingest
-code services/telemetry-processor    # Window 3: Processor
-code services/telemetry-frontend     # Window 4: Frontend
+code services/telemetry-simulator-backend     # Window 1: Simulator Backend
+code services/telemetry-simulator-frontend    # Window 2: Simulator Frontend
+code services/telemetry-ingest                # Window 3: Ingest
+code services/telemetry-processor             # Window 4: Processor
+code services/telemetry-frontend              # Window 5: Frontend
 
 # Each window will prompt: "Reopen in Container"
 # Or use Command Palette: "Dev Containers: Reopen in Container"
@@ -363,8 +364,8 @@ ctest --verbose
 cd services/telemetry-processor
 pytest tests/ -v --cov=. --cov-report=html
 
-# Simulator
-cd services/telemetry-simulator
+# Simulator Backend
+cd services/telemetry-simulator-backend
 pytest tests/ -v --cov=. --cov-report=html
 
 # View coverage

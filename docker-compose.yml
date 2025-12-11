@@ -12,13 +12,13 @@ services:
       timeout: 5s
       retries: 3
 
-  # Service 0: Telemetry Simulator (Replaces F1 Game for testing)
-  telemetry-simulator:
+  # Service 0: Telemetry Simulator Backend (Replaces F1 Game for testing)
+  telemetry-simulator-backend:
     build:
-      context: ./services/telemetry-simulator
+      context: ./services/telemetry-simulator-backend
       dockerfile: Dockerfile
       target: runtime
-    container_name: f1-telemetry-simulator
+    container_name: f1-telemetry-simulator-backend
     restart: unless-stopped
     environment:
       - TARGET_HOST=telemetry-ingest
@@ -27,7 +27,7 @@ services:
     networks:
       - f1-telemetry-network
     volumes:
-      - ./services/telemetry-simulator/config:/app/config
+      - ./services/telemetry-simulator-backend/config:/app/config
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.close()"]
       interval: 30s
@@ -37,6 +37,27 @@ services:
     depends_on:
       telemetry-ingest:
         condition: service_healthy
+
+  # Service 0.5: Telemetry Simulator Frontend (Control interface for simulator)
+  telemetry-simulator-frontend:
+    build:
+      context: ./services/telemetry-simulator-frontend
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: f1-telemetry-simulator-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:80"  # Production Nginx port
+    environment:
+      - NODE_ENV=production
+    networks:
+      - f1-telemetry-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
   # Service 1: Telemetry Ingest (C++ UDP Listener & Parser)
   telemetry-ingest:
