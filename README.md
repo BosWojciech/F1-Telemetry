@@ -107,6 +107,26 @@ Each service has a dedicated dev container configuration for isolated developmen
    - Debugging configured
    - Extensions ready
 
+### Protobuf Setup
+
+The project uses Protocol Buffers for data definitions. To generate the necessary code:
+
+1.  **Install Dependencies**:
+    ```bash
+    make setup-proto
+    ```
+
+2.  **Generate Code**:
+    ```bash
+    make proto
+    ```
+    This will generate Python code in `services/telemetry-simulator/proto`.
+
+    You can specify the F1 game version (default is 23):
+    ```bash
+    make proto F1_GAME_VERSION=23
+    ```
+
 ### Local Development Setup
 
 #### Telemetry Ingest (C++)

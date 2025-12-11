@@ -4,14 +4,20 @@ Packet Generator for F1 Telemetry Simulator
 Generates realistic F1 telemetry packets based on configuration.
 """
 
-import struct
 import random
 import time
 from typing import Dict, Any, Optional
+import sys
+import os
+
+# Import generated protobuf classes
+# Ensure the directory is in path
+sys.path.append(os.path.dirname(__file__))
+from proto import packet_definitions_pb2
 
 
 class PacketGenerator:
-    """Generates F1 telemetry packets"""
+    """Generates F1 telemetry packets using Protobuf"""
     
     def __init__(self, config: Dict[str, Any]):
         """
@@ -88,72 +94,61 @@ class PacketGenerator:
         elif packet_type == 'Participants':
             return self._generate_participants_packet(settings)
         else:
-            return self._generate_generic_packet(settings)
+            return b''
     
-    def _generate_packet_header(self, packet_id: int) -> bytes:
+    def _create_packet_header(self, packet_id: int) -> packet_definitions_pb2.PacketHeader:
         """Generate common packet header"""
-        # Header: packetFormat, gameYear, gameMajorVersion, gameMinorVersion, packetVersion, packetId, 
-        #         sessionUID, sessionTime, frameIdentifier, overallFrameIdentifier, playerCarIndex, secondaryPlayerCarIndex
-        header = struct.pack(
-            '<HBBBBBQfIIBB',
-            self.packet_format,  # packetFormat (uint16)
-            24,  # gameYear (uint8) - F1 2024
-            1,  # gameMajorVersion (uint8)
-            0,  # gameMinorVersion (uint8)
-            1,  # packetVersion (uint8)
-            packet_id,  # packetId (uint8)
-            12345678,  # sessionUID (uint64)
-            self.session_time,  # sessionTime (float)
-            int(self.simulation_time * 60),  # frameIdentifier (uint32)
-            int(self.simulation_time * 60),  # overallFrameIdentifier (uint32)
-            0,  # playerCarIndex (uint8)
-            255   # secondaryPlayerCarIndex (uint8) - 255 means no second player
-        )
+        header = packet_definitions_pb2.PacketHeader()
+        header.packet_format = self.packet_format
+        header.game_year = 23
+        header.game_major_version = 1
+        header.game_minor_version = 0
+        header.packet_version = 1
+        header.packet_id = packet_id
+        header.session_uid = 12345678
+        header.session_time = self.session_time
+        header.frame_identifier = int(self.simulation_time * 60)
+        header.overall_frame_identifier = int(self.simulation_time * 60)
+        header.player_car_index = 0
+        header.secondary_player_car_index = 255
         
         self.session_time += 0.016  # Increment by ~1 frame at 60Hz
         return header
     
     def _generate_session_packet(self, settings: Dict[str, Any]) -> bytes:
         """Generate session data packet (ID: 1)"""
-        header = self._generate_packet_header(1)
+        packet = packet_definitions_pb2.PacketSessionData()
+        packet.header.CopyFrom(self._create_packet_header(1))
         
-        # Session data
-        weather = settings.get('weather', 0)  # Clear
-        track_temp = settings.get('track_temperature', 25)
-        air_temp = settings.get('air_temperature', 20)
+        packet.weather = settings.get('weather', 0)
+        packet.track_temperature = int(settings.get('track_temperature', 25))
+        packet.air_temperature = int(settings.get('air_temperature', 20))
+        packet.total_laps = 58
+        packet.track_length = 5303
+        packet.session_type = 10 # Race
+        packet.track_id = 0 # Melbourne
+        packet.formula = 0 # F1 Modern
+        packet.session_time_left = 3600
+        packet.session_duration = 7200
+        packet.pit_speed_limit = 80
+        packet.game_paused = 0
+        packet.is_spectating = 0
+        packet.spectator_car_index = 0
+        packet.sli_pro_native_support = 0
+        packet.num_marshal_zones = 0
+        packet.safety_car_status = 0
+        packet.network_game = 0
+        packet.num_weather_forecast_samples = 0
         
-        session_data = struct.pack(
-            '<BBhhBBBBBBHHHHHBBBBBBBBBBB',
-            weather,  # weather
-            int(track_temp),  # trackTemperature
-            int(air_temp),  # airTemperature
-            0,  # totalLaps
-            2000,  # trackLength
-            1,  # sessionType (race)
-            1,  # trackId (Melbourne)
-            1,  # formula (F1 Modern)
-            3600,  # sessionTimeLeft
-            3600,  # sessionDuration
-            100,  # pitSpeedLimit
-            0,  # gamePaused
-            0,  # isSpectating
-            0,  # spectatorCarIndex
-            0,  # sliProNativeSupport
-            22,  # numMarshalZones
-            # Marshal zones (simplified)
-            *[0] * 22,  # zoneStart
-            *[0] * 22,  # zoneFlag
-        )
-        
-        return header + session_data
+        return packet.SerializeToString()
     
     def _generate_lap_packet(self, settings: Dict[str, Any]) -> bytes:
         """Generate lap data packet (ID: 2)"""
-        header = self._generate_packet_header(2)
+        packet = packet_definitions_pb2.PacketLapData()
+        packet.header.CopyFrom(self._create_packet_header(2))
         
-        # Lap data for all 22 cars
-        lap_data = b''
         for i in range(22):
+            lap_data = packet.lap_data.add()
             if i == 0:  # Player car
                 lap_time = random.uniform(85.0, 95.0)
                 sector1 = random.uniform(25.0, 30.0)
@@ -163,42 +158,23 @@ class PacketGenerator:
                 sector1 = random.uniform(25.0, 35.0)
                 sector2 = random.uniform(28.0, 38.0)
             
-            car_lap_data = struct.pack(
-                '<IfHHHHBBBBBBBBfBBHff',
-                int(lap_time * 1000),  # lastLapTimeInMS
-                lap_time,  # currentLapTimeInMS
-                int(sector1 * 1000),  # sector1TimeInMS
-                int(sector2 * 1000),  # sector2TimeInMS
-                0,  # lapDistance
-                0,  # totalDistance
-                0,  # safetyCarDelta
-                self.lap_number if i == 0 else random.randint(1, 5),  # carPosition
-                self.lap_number,  # currentLapNum
-                0,  # pitStatus
-                1,  # numPitStops
-                0,  # sector
-                0,  # currentLapInvalid
-                0,  # penalties
-                0,  # warnings
-                0,  # numUnservedDriveThroughPens
-                0,  # numUnservedStopGoPens
-                0,  # gridPosition
-                0,  # driverStatus
-                0.0,  # resultStatus
-                0.0,  # pitLaneTimerActive
-                0.0   # pitLaneTimeInLaneInMS
-            )
-            lap_data += car_lap_data
-        
-        return header + lap_data
+            lap_data.last_lap_time_in_ms = int(lap_time * 1000)
+            lap_data.current_lap_time_in_ms = int(lap_time * 1000) # Simplified
+            lap_data.sector1_time_in_ms = int(sector1 * 1000)
+            lap_data.sector2_time_in_ms = int(sector2 * 1000)
+            lap_data.car_position = self.lap_number if i == 0 else random.randint(1, 20)
+            lap_data.current_lap_num = self.lap_number
+            lap_data.num_pit_stops = 1
+            
+        return packet.SerializeToString()
     
     def _generate_telemetry_packet(self, settings: Dict[str, Any]) -> bytes:
         """Generate car telemetry packet (ID: 6)"""
-        header = self._generate_packet_header(6)
+        packet = packet_definitions_pb2.PacketCarTelemetryData()
+        packet.header.CopyFrom(self._create_packet_header(6))
         
-        # Telemetry data for all 22 cars
-        telemetry_data = b''
         for i in range(22):
+            car_telemetry = packet.car_telemetry_data.add()
             if i == 0:  # Player car
                 speed = random.uniform(200, 320)
                 throttle = random.uniform(0.5, 1.0)
@@ -210,137 +186,91 @@ class PacketGenerator:
                 brake = random.uniform(0.0, 0.5)
                 gear = random.randint(3, 8)
             
-            car_telemetry = struct.pack(
-                '<HffBbHBBBBHHHHBBBB',
-                int(speed),  # speed
-                throttle,  # throttle
-                brake,  # brake (simplified steering)
-                brake,  # brake
-                gear,  # gear
-                random.randint(8000, 12000),  # engineRPM
-                0,  # drs
-                random.randint(50, 100),  # revLightsPercent
-                random.randint(50, 100),  # revLightsBitValue
-                random.randint(400, 600),  # brakesTemperature[0]
-                random.randint(400, 600),  # brakesTemperature[1]
-                random.randint(400, 600),  # brakesTemperature[2]
-                random.randint(400, 600),  # brakesTemperature[3]
-                random.randint(70, 90),  # tyresSurfaceTemperature[0]
-                random.randint(70, 90),  # tyresSurfaceTemperature[1]
-                random.randint(70, 90),  # tyresSurfaceTemperature[2]
-                random.randint(70, 90),  # tyresSurfaceTemperature[3]
-            )
-            telemetry_data += car_telemetry
-        
-        # MFD panel and button status
-        mfd_data = struct.pack('<BB', 0, 0)
-        
-        return header + telemetry_data + mfd_data
+            car_telemetry.speed = int(speed)
+            car_telemetry.throttle = throttle
+            car_telemetry.brake = brake
+            car_telemetry.gear = gear
+            car_telemetry.engine_rpm = random.randint(8000, 12000)
+            car_telemetry.drs = 0
+            car_telemetry.rev_lights_percent = random.randint(50, 100)
+            
+            car_telemetry.brakes_temperature.extend([random.randint(400, 600) for _ in range(4)])
+            car_telemetry.tyres_surface_temperature.extend([random.randint(70, 90) for _ in range(4)])
+            car_telemetry.tyres_inner_temperature.extend([random.randint(70, 90) for _ in range(4)])
+            car_telemetry.engine_temperature = 90
+            car_telemetry.tyres_pressure.extend([23.0] * 4)
+            car_telemetry.surface_type.extend([0] * 4)
+
+        return packet.SerializeToString()
     
     def _generate_car_status_packet(self, settings: Dict[str, Any]) -> bytes:
         """Generate car status packet (ID: 7)"""
-        header = self._generate_packet_header(7)
+        packet = packet_definitions_pb2.PacketCarStatusData()
+        packet.header.CopyFrom(self._create_packet_header(7))
         
-        # Simplified car status for all 22 cars
-        status_data = b''
         for i in range(22):
-            car_status = struct.pack(
-                '<BBBBBBBBBBBBBBBBBBB',
-                1,  # tractionControl
-                0,  # antiLockBrakes
-                random.randint(50, 100),  # fuelMix
-                0,  # frontBrakeBias
-                0,  # pitLimiterStatus
-                random.randint(30, 50),  # fuelInTank
-                100,  # fuelCapacity
-                random.randint(0, 5),  # fuelRemainingLaps
-                0,  # maxRPM
-                0,  # idleRPM
-                8,  # maxGears
-                0,  # drsAllowed
-                0,  # drsActivationDistance
-                16,  # actualTyreCompound
-                2,  # visualTyreCompound
-                0,  # tyresAgeLaps
-                -1,  # vehicleFiaFlags
-                0,  # ersStoreEnergy
-                0,  # ersDeployMode
-            )
-            status_data += car_status
-        
-        return header + status_data
+            status = packet.car_status_data.add()
+            status.traction_control = 1
+            status.anti_lock_brakes = 0
+            status.fuel_mix = 1
+            status.front_brake_bias = 50
+            status.pit_limiter_status = 0
+            status.fuel_in_tank = 20.0
+            status.fuel_capacity = 100.0
+            status.max_rpm = 13500
+            status.idle_rpm = 3000
+            status.max_gears = 8
+            status.drs_allowed = 0
+            status.actual_tyre_compound = 16
+            status.visual_tyre_compound = 16
+            
+        return packet.SerializeToString()
     
     def _generate_motion_packet(self, settings: Dict[str, Any]) -> bytes:
         """Generate motion packet (ID: 0)"""
-        header = self._generate_packet_header(0)
+        packet = packet_definitions_pb2.PacketMotionData()
+        packet.header.CopyFrom(self._create_packet_header(0))
         
-        # PacketMotionData = Header (29 bytes) + 22 CarMotionData structs
-        # Expected total: 1349 bytes, so motion data = 1349 - 29 = 1320 bytes
-        # That's 1320 / 22 = 60 bytes per car
-        # CarMotionData: 6 floats (24 bytes) + 6 int16 (12 bytes) + 6 floats (24 bytes) = 60 bytes ✓
-        
-        motion_data = b''
-        for car in range(22):  # 22 cars
-            # 6 position/velocity floats
-            car_data = struct.pack('<' + 'f' * 6, 
-                random.uniform(-1000, 1000),  # worldPositionX
-                random.uniform(-100, 100),     # worldPositionY
-                random.uniform(-1000, 1000),  # worldPositionZ
-                random.uniform(-100, 100),     # worldVelocityX
-                random.uniform(-100, 100),     # worldVelocityY
-                random.uniform(-100, 100))     # worldVelocityZ
+        for i in range(22):
+            motion = packet.car_motion_data.add()
+            motion.world_position_x = random.uniform(-1000, 1000)
+            motion.world_position_y = random.uniform(-100, 100)
+            motion.world_position_z = random.uniform(-1000, 1000)
+            motion.world_velocity_x = random.uniform(-100, 100)
+            motion.world_velocity_y = random.uniform(-100, 100)
+            motion.world_velocity_z = random.uniform(-100, 100)
             
-            # 6 direction int16s
-            car_data += struct.pack('<' + 'h' * 6,
-                *[random.randint(-32768, 32767) for _ in range(6)])
+            motion.world_forward_dir_x = random.randint(-32768, 32767)
+            motion.world_forward_dir_y = random.randint(-32768, 32767)
+            motion.world_forward_dir_z = random.randint(-32768, 32767)
             
-            # 6 force/rotation floats
-            car_data += struct.pack('<' + 'f' * 6,
-                random.uniform(-5, 5),    # gForceLateral
-                random.uniform(-5, 5),    # gForceLongitudinal
-                random.uniform(-5, 5),    # gForceVertical
-                random.uniform(-3.14, 3.14),  # yaw
-                random.uniform(-1.57, 1.57),  # pitch
-                random.uniform(-1.57, 1.57))  # roll
+            motion.g_force_lateral = random.uniform(-5, 5)
+            motion.g_force_longitudinal = random.uniform(-5, 5)
+            motion.g_force_vertical = random.uniform(-5, 5)
+            motion.yaw = random.uniform(-3.14, 3.14)
+            motion.pitch = random.uniform(-1.57, 1.57)
+            motion.roll = random.uniform(-1.57, 1.57)
             
-            motion_data += car_data
-        
-        return header + motion_data
+        return packet.SerializeToString()
     
     def _generate_participants_packet(self, settings: Dict[str, Any]) -> bytes:
         """Generate participants packet (ID: 4)"""
-        header = self._generate_packet_header(4)
+        packet = packet_definitions_pb2.PacketParticipantsData()
+        packet.header.CopyFrom(self._create_packet_header(4))
         
         num_cars = settings.get('num_cars', 20)
-        participants_data = struct.pack('<B', num_cars)
+        packet.num_active_cars = num_cars
         
-        # Simplified participant data for each car
         for i in range(22):
+            participant = packet.participants.add()
             if i < num_cars:
-                participant = struct.pack(
-                    '<BB48sBBBBBBBB',
-                    1 if i < num_cars else 0,  # aiControlled
-                    i,  # driverId
-                    f"Driver {i}".encode('utf-8').ljust(48, b'\x00'),  # name
-                    0,  # networkId
-                    0,  # teamId
-                    0,  # myTeam
-                    0,  # raceNumber
-                    0,  # nationality
-                    0,  # yourTelemetry
-                    0,  # showOnlineNames
-                    0   # platform
-                )
-            else:
-                participant = struct.pack('<BB48sBBBBBBBB', *[0] * 58)
+                participant.ai_controlled = 1
+                participant.driver_id = i
+                participant.name = f"Driver {i}"
+                participant.nationality = 1
+                participant.race_number = i + 1
+                participant.team_id = i % 10
             
-            participants_data += participant
-        
-        return header + participants_data
+        return packet.SerializeToString()
     
-    def _generate_generic_packet(self, settings: Dict[str, Any]) -> bytes:
-        """Generate a generic packet when specific type is not implemented"""
-        header = self._generate_packet_header(255)
-        # Add some dummy data
-        dummy_data = bytes([0] * 100)
-        return header + dummy_data
+
