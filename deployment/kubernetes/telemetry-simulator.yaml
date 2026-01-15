@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-simulator
+  labels:
+    app: telemetry-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telemetry-simulator
+  template:
+    metadata:
+      labels:
+        app: telemetry-simulator
+    spec:
+      containers:
+        - name: telemetry-simulator
+          image: f1-telemetry-simulator:dev
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: TARGET_HOST
+              value: "telemetry-ingest"
+            - name: TARGET_PORT
+              value: "20777"
+            - name: CONFIG_FILE
+              value: "config/race_simulation.json"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: telemetry-simulator
+spec:
+  selector:
+    app: telemetry-simulator
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

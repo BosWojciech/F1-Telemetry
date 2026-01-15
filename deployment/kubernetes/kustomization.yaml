@@ -1,0 +1,7 @@
+resources:
+  - telemetry-ingest.yaml
+  - telemetry-processor.yaml
+  - telemetry-frontend.yaml
+  - telemetry-simulator.yaml
+  - zeromq-broker.yaml
+namespace: f1-telemetry

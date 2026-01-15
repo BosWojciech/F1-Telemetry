@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zeromq-broker
+  labels:
+    app: zeromq-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zeromq-broker
+  template:
+    metadata:
+      labels:
+        app: zeromq-broker
+    spec:
+      containers:
+        - name: zeromq-broker
+          image: alpine:latest
+          command: ["/bin/sh", "-c", "tail -f /dev/null"]
+          ports: []
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "true"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zeromq-broker
+spec:
+  selector:
+    app: zeromq-broker
+  ports: []
+  type: ClusterIP

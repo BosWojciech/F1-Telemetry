@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-ingest
+  labels:
+    app: telemetry-ingest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telemetry-ingest
+  template:
+    metadata:
+      labels:
+        app: telemetry-ingest
+    spec:
+      containers:
+        - name: telemetry-ingest
+          image: f1-telemetry-ingest:dev
+          ports:
+            - containerPort: 20777
+              protocol: UDP
+            - containerPort: 5555
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "pgrep -f telemetry-ingest || exit 1"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: telemetry-ingest
+spec:
+  selector:
+    app: telemetry-ingest
+  ports:
+    - name: udp-listen
+      protocol: UDP
+      port: 20777
+      targetPort: 20777
+    - name: zmq
+      protocol: TCP
+      port: 5555
+      targetPort: 5555
+  type: ClusterIP

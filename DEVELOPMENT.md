@@ -158,6 +158,7 @@ devpod ssh F1-Telemetry
 cd services/telemetry-processor
 ```
 
+> Note: DevPod with provider set to `kubernetes` does not support docker-compose-based workspaces; it requires building images from Dockerfiles. This repository provides Dockerfiles for each service under `services/*` so DevPod can build the service images directly (or use `provider: docker` if you need docker-compose behavior).
 ### Option 3: Local Development
 
 #### C++ Service (Ingest)
