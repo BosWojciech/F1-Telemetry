@@ -130,19 +130,20 @@ proto: setup-proto ## Generate protobuf files
 	@echo "$(GREEN)Protobuf files generated in $(SIMULATOR_PROTO_DIR)$(NC)"
 
 # Cleanup commands
-clean: ## Remove all containers, volumes, and images
-	@echo "$(RED)Cleaning up all resources...$(NC)"
-	docker-compose down -v --rmi all
+clean: ## Remove all containers, volumes, and images (project-only)
+	@echo "$(RED)Cleaning up project Docker Compose resources...$(NC)"
+	docker-compose -f docker-compose.dev.yml -p f1-telemetry down -v --rmi local
 	@echo "$(GREEN)Cleanup complete!$(NC)"
 
 clean-volumes: ## Remove all volumes (WARNING: deletes data)
-	@echo "$(RED)Removing all volumes...$(NC)"
-	docker-compose down -v
+	@echo "$(RED)Removing project volumes...$(NC)"
+	docker-compose -f docker-compose.dev.yml -p f1-telemetry down -v
 	@echo "$(GREEN)Volumes removed!$(NC)"
 
-prune: ## Remove unused Docker resources
-	@echo "$(RED)Pruning unused Docker resources...$(NC)"
-	docker system prune -af --volumes
+prune: ## Remove unused Docker resources (safer)
+	@echo "$(RED)Pruning unused Docker images and builders...$(NC)"
+	docker image prune -af || true
+	docker builder prune -af || true
 	@echo "$(GREEN)Prune complete!$(NC)"
 
 # Testing commands

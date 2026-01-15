@@ -6,7 +6,7 @@
         "target": "development"
     },
     "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-ingest",
-    "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined", "--network=host"],
+    "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined", "--network=f1-telemetry-network"],
     
     "features": {
         "ghcr.io/devcontainers/features/git:1": {}

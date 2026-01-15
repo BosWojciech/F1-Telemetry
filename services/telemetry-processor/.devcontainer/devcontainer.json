@@ -6,7 +6,7 @@
         "target": "development"
     },
     "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-processor",
-    "runArgs": ["--network=host"],
+    "runArgs": ["--network=f1-telemetry-network"],
     
     "features": {
         "ghcr.io/devcontainers/features/git:1": {}
