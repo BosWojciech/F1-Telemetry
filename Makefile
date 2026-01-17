@@ -1,4 +1,4 @@
-.PHONY: help build up down logs clean dev-up dev-down restart ps health
+.PHONY: help build up down logs clean dev-up dev-down restart ps health dev-telemetry-frontend dev-telemetry-ingest dev-telemetry-processor dev-telemetry-simulator
 
 # Colors for output
 BLUE := \033[0;34m
@@ -46,6 +46,23 @@ dev-down: ## Stop development services
 
 dev-logs: ## View development logs
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f
+
+# VS Code Dev Container Commands
+dev-telemetry-frontend: ## Open telemetry-frontend in VS Code dev container
+	@echo "$(BLUE)Opening telemetry-frontend in dev container...$(NC)"
+	cd services/telemetry-frontend && code .
+
+dev-telemetry-ingest: ## Open telemetry-ingest in VS Code dev container
+	@echo "$(BLUE)Opening telemetry-ingest in dev container...$(NC)"
+	cd services/telemetry-ingest && code .
+
+dev-telemetry-processor: ## Open telemetry-processor in VS Code dev container
+	@echo "$(BLUE)Opening telemetry-processor in dev container...$(NC)"
+	cd services/telemetry-processor && code .
+
+dev-telemetry-simulator: ## Open telemetry-simulator in VS Code dev container
+	@echo "$(BLUE)Opening telemetry-simulator in dev container...$(NC)"
+	cd services/telemetry-simulator && code .
 
 # Service-specific commands
 logs: ## View logs from all services

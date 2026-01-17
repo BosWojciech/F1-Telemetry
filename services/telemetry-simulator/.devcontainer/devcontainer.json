@@ -1,69 +1,16 @@
 {
-    "name": "F1 Telemetry Simulator - FastAPI Backend",
-    "build": {
-        "dockerfile": "../Dockerfile",
-        "context": "..",
-        "target": "development"
-    },
-    "workspaceFolder": "/workspaces/F1-Telemetry/services/telemetry-simulator",
-    "workspaceMount": "source=${localWorkspaceFolder}/../..,target=/workspaces/F1-Telemetry,type=bind",
-    "runArgs": [
-        "--network=f1-telemetry-network"
-    ],
-    "features": {
-        "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/python:1": {
-            "version": "3.11"
-        }
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-python.black-formatter",
-                "charliermarsh.ruff",
-                "ms-python.debugpy"
-            ],
-            "settings": {
-                "python.defaultInterpreterPath": "/app/.venv/bin/python",
-                "python.terminal.activateEnvironment": true,
-                "editor.formatOnSave": true,
-                "editor.codeActionsOnSave": {
-                    "source.organizeImports": "explicit"
-                },
-                "[python]": {
-                    "editor.defaultFormatter": "ms-python.black-formatter"
-                },
-                "python.testing.pytestEnabled": true,
-                "python.testing.unittestEnabled": false,
-                "python.analysis.exclude": [
-                    "**/proto/**",
-                    "**/*_pb2.py"
-                ],
-                "python.analysis.ignore": [
-                    "**/proto/**",
-                    "**/*_pb2.py"
-                ],
-                "python.analysis.extraPaths": [
-                    "${workspaceFolder}"
-                ]
-            }
-        }
-    },
-    "forwardPorts": [
-        8000,
-        5678
-    ],
-    "portsAttributes": {
-        "8000": {
-            "label": "FastAPI",
-            "onAutoForward": "notify"
-        },
-        "5678": {
-            "label": "Python Debugger"
-        }
-    },
-    "postCreateCommand": "poetry install",
-    "remoteUser": "telemetry"
+  "name": "F1 Telemetry: telemetry-simulator",
+  "image": "mcr.microsoft.com/devcontainers/python:latest",
+  "workspaceFolder": "/workspaces/f1-telemetry/services/telemetry-simulator",
+  "workspaceMount": "source=${localWorkspaceFolder}/../../,target=/workspaces/f1-telemetry,type=bind",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
 }
