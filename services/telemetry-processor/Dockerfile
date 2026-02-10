@@ -3,7 +3,7 @@
 # ============================================
 # Stage 1: Base Stage
 # ============================================
-FROM python:3.11-slim AS base
+FROM python:3.14-slim AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
