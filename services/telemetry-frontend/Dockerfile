@@ -3,7 +3,7 @@
 # ============================================
 # Stage 1: Dependencies Stage
 # ============================================
-FROM node:20-alpine AS dependencies
+FROM node:25-alpine AS dependencies
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN npm ci
 # ============================================
 # Stage 2: Builder Stage
 # ============================================
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 WORKDIR /app
 
@@ -32,7 +32,7 @@ RUN npm run build
 # ============================================
 # Stage 3: Development Stage
 # ============================================
-FROM node:20-alpine AS development
+FROM node:25-alpine AS development
 
 WORKDIR /app
 
